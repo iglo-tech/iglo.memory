@@ -1,5 +1,8 @@
 # Retrieval v2 token-budget slice
 
+Direction update: [BGE-M3 amendment](retrieval-v2-bge-m3.md) supersedes conflicting
+embedding/BM25 choices and reduces further QMD execution.
+
 ## goal
 
 Make the measured default embedding envelope usable without losing source text.
