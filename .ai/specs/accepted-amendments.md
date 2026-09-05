@@ -50,3 +50,21 @@ Other candidate OS/architectures remain unverified, not silently promised or
 removed from the plan. Publish no release during this task.
 
 Next: build T01 shared setup and process-safe index foundation, then T02–T10.
+
+## Final implementation/verification scope
+
+D02 release-build decision: Linux x86_64 is the supported target for this PR,
+proved on the local runner and clean Debian container. The PRD does not name an
+OS/architecture matrix; the older multi-OS list was explicitly a candidate
+investigation, not a support promise. Those candidates remain unverified future
+ports and are not silently advertised as supported. They are not a new gate
+on the tested Linux executable. GitHub Actions provides the downloadable
+single-executable artifact for installation acceptance; no tagged release or
+merge is authorized by this finish task.
+
+D05 live proof: the owner configured a saved key and authorized one small live
+fixture batch plus two queries. Both semantic paraphrase and exact-term queries
+rank the intended document first. The source-unreadable search and saved-key
+cron-style execution pass; see live-openrouter.json. Bounded snippets remain
+the default response, without a full-document retrieval mode. A short prepared
+passage can fit entirely within the excerpt; no input-size rejection is added.

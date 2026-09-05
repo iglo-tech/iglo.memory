@@ -1,6 +1,6 @@
 """Run the executable in a disposable Debian container without language runtimes."""
-import json, pathlib, subprocess, tempfile
-binary=pathlib.Path('dist/iglo.mem').resolve()
+import json, pathlib, subprocess, tempfile, sys
+binary=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else 'dist/iglo.mem').resolve()
 image='debian@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171'
 with tempfile.TemporaryDirectory(prefix='iglo-clean-',dir='/tmp') as temp:
     root=pathlib.Path(temp)

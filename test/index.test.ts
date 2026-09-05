@@ -99,3 +99,30 @@ test('binary loader retains float32 values and rejects zero/nonfinite data even 
     expect(()=>readVector(root,{...receipt,vectorHash:'sha256:'+sha256(bytes)})).toThrow('index is invalid');
   }
 });
+
+test('committed populated snapshots work in fresh linked worktrees with concurrent source-unreadable searches',async()=>{
+  const {chmodSync}=await import('node:fs');
+  const {resolve}=await import('node:path');
+  const root=setup();const linked=fixture();
+  function git(args:string[]){const result=Bun.spawnSync(['git','-C',root,...args],{stdout:'pipe',stderr:'pipe'});if(result.exitCode!==0)throw new Error('Git fixture failed');}
+  git(['init','--quiet']);
+  const text='A prepared passage. '+ 'Long source content remains in the snapshot. '.repeat(30);
+  writeFileSync(join(root,'.agent/knowledge/passage.md'),text);
+  await prepare(root,config,async()=>[[1,0]],()=> 'fixture');
+  git(['add','.agent']);git(['-c','user.name=QA','-c','user.email=qa@example.invalid','commit','-qm','prepared fixture']);
+  git(['worktree','add','--quiet','-b','linked-fixture',linked]);
+  const originals=[root,linked].map(path=>readFileSync(join(indexPath(path),'snapshot.json')));
+  const module=resolve('src/search.ts');const home=fixture();const trusted=join(home,'trusted.toml');writeFileSync(trusted,'');
+  const children=[root,linked].map(path=>{
+    chmodSync(join(path,'.agent/knowledge'),0);
+    const script=`import {search} from ${JSON.stringify(module)};console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture')));`;
+    return Bun.spawn([process.execPath,'--no-env-file',`--config=${trusted}`,'-e',script],{cwd:path,env:{...process.env,HOME:home,OPENROUTER_API_KEY:undefined,PATH:'/nonexistent'},stdout:'pipe',stderr:'pipe'});
+  });
+  try{
+    for(const child of children){const result=JSON.parse(await new Response(child.stdout).text());expect(await child.exited).toBe(0);expect(result.results[0].source).toBe('.agent/knowledge/passage.md');expect(Array.from(result.results[0].snippet).length).toBe(401);expect(result.results[0].snippet).not.toBe(text);}
+    for(const [i,path] of [root,linked].entries())expect(readFileSync(join(indexPath(path),'snapshot.json'))).toEqual(originals[i]!);
+  }finally{
+    for(const child of children){if(child.exitCode===null)child.kill();await child.exited;}
+    for(const path of [root,linked])chmodSync(join(path,'.agent/knowledge'),0o755);
+  }
+});

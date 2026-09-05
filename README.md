@@ -106,8 +106,20 @@ For cron, configure your own working directory and use the saved key:
 
 ## Build and verification
 
-Current executable verification target: Linux x86_64. Other platforms remain
-unverified; no downloadable release has been published by this development PR.
+The supported build for this PR is Linux x86_64. Other platforms remain
+unverified and are not advertised as supported. No tagged release is published
+before PR approval/merge.
+
+The **Check and build Linux executable** GitHub Actions run attaches
+`iglo.mem-linux-x64.tar.gz`, containing the single executable with its executable
+permission preserved. Download it from the run's Artifacts section, then:
+
+```sh
+tar -xzf iglo.mem-linux-x64.tar.gz
+./iglo.mem init
+```
+
+PR artifacts expire after 14 days; rerunning the build creates a fresh download.
 The native build needs a C compiler and Node-API headers; these are build-time
 requirements. The executable embeds Bun and the small OS-lock binding. It does
 not require Bun, Node.js, npm, Git or a lock executable at runtime. It still needs

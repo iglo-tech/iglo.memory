@@ -1,0 +1,137 @@
+{
+  "startedAt": "2026-09-05T11:23:21.063758+00:00",
+  "revision": "34da6fa55a3085c15fd7c39336f7425a30777d9b",
+  "binarySHA256": "b46b3c211c6a4736802ca38ad5d1d701589eaba8a81433452d3c6f9afd4defe3",
+  "provider": "OpenRouter",
+  "model": "openai/text-embedding-3-small",
+  "credentialSource": "saved",
+  "status": "PASS",
+  "commands": [
+    {
+      "args": [
+        "init"
+      ],
+      "exit": 0,
+      "elapsedMs": 44.52,
+      "result": {
+        "project": "repo",
+        "credentialSource": "saved",
+        "credentialsSaved": false
+      }
+    },
+    {
+      "args": [
+        "prepare"
+      ],
+      "exit": 0,
+      "elapsedMs": 813.74,
+      "result": {
+        "project": "repo",
+        "preparedAt": "2026-09-05T11:23:21.978Z",
+        "documents": 3,
+        "chunks": 3,
+        "reusedVectors": 0,
+        "embeddedVectors": 3
+      }
+    },
+    {
+      "args": [
+        "prepare"
+      ],
+      "exit": 0,
+      "elapsedMs": 48.72,
+      "result": {
+        "project": "repo",
+        "preparedAt": "2026-09-05T11:23:22.033Z",
+        "documents": 3,
+        "chunks": 3,
+        "reusedVectors": 3,
+        "embeddedVectors": 0
+      }
+    },
+    {
+      "args": [
+        "search",
+        "How does the application keep someone signed in without asking for their password again?"
+      ],
+      "exit": 0,
+      "elapsedMs": 464.87,
+      "result": {
+        "query": "How does the application keep someone signed in without asking for their password again?",
+        "preparedAt": "2026-09-05T11:23:22.033Z",
+        "results": [
+          {
+            "score": 0.390097,
+            "source": ".agent/knowledge/authentication.md",
+            "heading": "Session renewal",
+            "startLine": 2,
+            "endLine": 2,
+            "snippet": "A login returns a short-lived access token and a long-lived refresh_token. When the access token expires, send the refresh_token to /auth/refresh to obtain a new access token without a password prompt. Rotate the refresh token on every use."
+          }
+        ]
+      }
+    },
+    {
+      "args": [
+        "search",
+        "refresh_token"
+      ],
+      "exit": 0,
+      "elapsedMs": 790.31,
+      "result": {
+        "query": "refresh_token",
+        "preparedAt": "2026-09-05T11:23:22.033Z",
+        "results": [
+          {
+            "score": 0.598782,
+            "source": ".agent/knowledge/authentication.md",
+            "heading": "Session renewal",
+            "startLine": 2,
+            "endLine": 2,
+            "snippet": "A login returns a short-lived access token and a long-lived refresh_token. When the access token expires, send the refresh_token to /auth/refresh to obtain a new access token without a password prompt. Rotate the refresh token on every use."
+          }
+        ]
+      }
+    },
+    {
+      "args": [
+        "status"
+      ],
+      "exit": 0,
+      "elapsedMs": 43.45,
+      "result": {
+        "project": "repo",
+        "preparedAt": "2026-09-05T11:23:22.033Z",
+        "documents": 3,
+        "chunks": 3,
+        "vectors": 3,
+        "missingVectors": 0,
+        "profile": "sha256:e23df2ce546113d770e758e1d1f984886125535ddbb79855c46d862c23a1d9d7"
+      }
+    },
+    {
+      "args": [
+        "gc"
+      ],
+      "exit": 0,
+      "elapsedMs": 47.15,
+      "result": {
+        "project": "repo",
+        "removedVectors": 0,
+        "retainedVectors": 3
+      }
+    }
+  ],
+  "scope": "Three disposable document inputs in one preparation batch; two real search queries. No user Markdown sent.",
+  "dimensions": 1536,
+  "sourcePreservation": true,
+  "snapshotPreservationDuringReadsAndGC": true,
+  "savedCredentialUnchanged": true,
+  "semanticTopResult": ".agent/knowledge/authentication.md",
+  "exactTopResult": ".agent/knowledge/authentication.md",
+  "sourceUnreadableSearch": true,
+  "documentEmbeddingInputs": 3,
+  "queryEmbeddingInputs": 2,
+  "unchangedPreparationEmbeddedVectors": 0,
+  "cleanup": "Disposable repository removed; user saved credentials unchanged."
+}
