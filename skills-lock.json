@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skills": {
+    "build": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/build/SKILL.md",
+      "computedHash": "0bed6c981744d91dceefeb24107f23ba5d1154c8775b3d8cee0aab5e82beb224"
+    },
+    "deep-design": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/deep-design/SKILL.md",
+      "computedHash": "3cf24024fb2253bc87999afcc3942388ed746464ec94c2ef83313e37672f6f9b"
+    },
+    "finish": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finish/SKILL.md",
+      "computedHash": "50a25323cdc267c4fb8fc0f4b505fe7b6ae4236841543cd136a40624d1b07694"
+    },
+    "how": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/how/SKILL.md",
+      "computedHash": "c6f5c635683374c5882219fb58919112ef2f2ab08c6b0b8d5155e2af8b0e53c1"
+    },
+    "intake": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/intake/SKILL.md",
+      "computedHash": "652c566381fbdb9c39531f15f1c83b73cb30a0149c03ad1c3d04f9835bc236ac"
+    },
+    "prototype": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/prototype/SKILL.md",
+      "computedHash": "df1097f4eccf926ec4d053c2d0666cd0056e65d1bfc95d269920a03b944c29fa"
+    },
+    "research": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/research/SKILL.md",
+      "computedHash": "7722032b9ecc945f3ed8d6ed73b34fc00dd9ebebb159ac94d3596bbe2886513b"
+    },
+    "retro": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/retro/SKILL.md",
+      "computedHash": "46c8149cd99d3e311be5f597bd2ef71baf36410755f7c16b850df1c0d40f001e"
+    },
+    "review": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review/SKILL.md",
+      "computedHash": "bfa255e367e3c7604655631a2a24a88b2618aecafcbb81e499c8cb3889b62fd3"
+    },
+    "review-gilfoyle": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-gilfoyle/SKILL.md",
+      "computedHash": "5fe2e05b3e75450b1b1fd8aeb1505b25b7ccbf98913ce3538f4f677975fd8e03"
+    },
+    "review-ponytail": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-ponytail/SKILL.md",
+      "computedHash": "dbaf50d3ac14346f06bfa49518a1bea9c8993726bc04033f9e796add20641e1e"
+    },
+    "review-standard": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-standard/SKILL.md",
+      "computedHash": "acb44825aa5de38ad91c63e6334a5eed17d42442393933738e58a53cb1dd7925"
+    },
+    "setup": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/setup/SKILL.md",
+      "computedHash": "629a37e7b8a4e98ed48db75f8ce402faf6ff8689d66409dca7263dfedab7bcb3"
+    },
+    "shape": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/shape/SKILL.md",
+      "computedHash": "bc819988ce3f4cfdd5c491930c37ab6e7940c7155f8b3cf6b44cbe0c142f8a7b"
+    },
+    "specify": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/specify/SKILL.md",
+      "computedHash": "a6c15c3606789ae0a0fd2b2ff20a2884809ca44244a9b2a87e533e023c135f86"
+    },
+    "ui-dev": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/ui-dev/SKILL.md",
+      "computedHash": "43ceaf35d6a009a71111707ac393412aa04c27d147f9d4be6c1a94690465ac6d"
+    },
+    "ux-proof": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/ux-proof/SKILL.md",
+      "computedHash": "723c149e4b97a4d25ae5b1f394b3c28ce9eea6a357969f5aa99c0a90dbf594a5"
+    },
+    "verify": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/verify/SKILL.md",
+      "computedHash": "90ada9dba9436bf895cd9c368c6956a5e8b26e38a0bff134a77ad0d2a854334c"
+    },
+    "wayfinder": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/wayfinder/SKILL.md",
+      "computedHash": "55e86c0955060906974e2290fd15fa304d7b4bee0ca5248d6d1d1775d88e157d"
+    },
+    "why": {
+      "source": "igloczek/skills",
+      "sourceType": "github",
+      "skillPath": "skills/addons/why/SKILL.md",
+      "computedHash": "8c1762bd1efd703399588c015491514897eee38116cc7f9093fdc289299324a0"
+    }
+  }
+}
