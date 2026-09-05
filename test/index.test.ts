@@ -6,7 +6,10 @@ import { search, status, gc } from '@/src/search';
 import { readSnapshot, indexPath, parseSnapshot } from '@/src/store';
 import { fixture, repository, cleanup, cli } from '@/test/helpers';
 import type { Config } from '@/src/config';
-const config: Config = { project: 'fixture', embedding: { model: 'test-model' } };
+const config: Config = {
+  project: 'fixture',
+  embedding: { model: 'openai/text-embedding-3-small' },
+};
 function setup() {
   const root = repository();
   mkdirSync(join(root, '.agent/knowledge'), { recursive: true });

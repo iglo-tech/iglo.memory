@@ -21,9 +21,9 @@ try {
     `const log=Bun.file(${JSON.stringify(log)});
   globalThis.fetch=Object.assign(async(url,init)=>{
     if(String(url)!=='https://openrouter.ai/api/v1/embeddings')throw new Error('unexpected endpoint');
-    const body=JSON.parse(init.body);await Bun.write(log,(await log.text())+JSON.stringify({model:body.model,inputs:body.input.length,kind:body.input[0].startsWith('Project: ')?'documents':'query'})+'\\n');
+    const body=JSON.parse(init.body);await Bun.write(log,(await log.text())+JSON.stringify({model:body.model,inputs:body.input.length,kind:body.input[0].startsWith('Context: ')?'documents':'query'})+'\\n');
     if(body.input.some(text=>text.includes('FAIL_PROVIDER')))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
-    return Response.json({data:body.input.map((text,index)=>({index,embedding:text.toLowerCase().includes('token')?[1,0,0]:[0,1,0]})).reverse()});
+    return Response.json({data:body.input.map((text,index)=>({index,embedding:Array.from({length:4096},(_,i)=>i===(text.toLowerCase().includes('token')?0:1)?1:0)})).reverse()});
   },{preconnect:()=>{}});`,
   );
   const cli = resolve('src/cli.ts');

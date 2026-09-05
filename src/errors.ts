@@ -20,6 +20,11 @@ const messages = {
     'Could not update the index. Check repository permissions and run iglo.mem prepare.',
   SOURCE_INVALID:
     'Could not read the configured Markdown sources. Check their permissions and symlinks.',
+  QUERY_TOO_LARGE:
+    'The complete question exceeds the supported request budget. Use a shorter question.',
+  RERANK_FAILED:
+    'The reranking request failed. Check the model, input limits and OpenRouter connectivity.',
+  SEARCH_TIMEOUT: 'The search exceeded its total deadline. Retry the operation.',
   EMBEDDING_FAILED:
     'The embedding request failed. Check OPENROUTER_API_KEY or run iglo.mem init --reset-credentials; also check model, provider input limits and connectivity.',
   INDEX_BUSY: 'The index is busy. Retry after the other operation finishes.',
