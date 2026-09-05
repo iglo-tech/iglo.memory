@@ -14,12 +14,12 @@ function location(home: string, create: boolean): string {
   try {
     checkAncestors(home);
     const physical = realpathSync(home);
-    for (let part = physical;; part = dirname(part)) {
+    const config = join(physical, '.config'); const app = join(config, 'iglo.mem');
+    checkAncestors(app);
+    for (let part = app;; part = dirname(part)) {
       if (exists(join(part, '.git'))) throw new AppError('CREDENTIALS_INVALID');
       if (dirname(part) === part) break;
     }
-    const config = join(physical, '.config'); const app = join(config, 'iglo.mem');
-    checkAncestors(app);
     if (create) {
       if (!exists(config)) mkdirSync(config, { mode: 0o700 });
       directory(config);

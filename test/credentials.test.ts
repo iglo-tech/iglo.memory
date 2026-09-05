@@ -60,3 +60,22 @@ test('concurrent successful saves leave one complete value and last completed sa
   expect(['dummy-A','dummy-B']).toContain(resolveCredential(home,'')!.key);
   saveCredential('final-dummy',home);expect(resolveCredential(home,'')?.key).toBe('final-dummy');
 });
+
+test('ordinary dotfiles repositories below home reject saved credential reads and writes',async()=>{
+  for(const relative of ['.config','.config/iglo.mem']) {
+    for(const gitfile of [false,true]) {
+      const home=fixture();saveCredential('existing-dummy',home);
+      const repo=join(home,relative);const marker=join(repo,'.git');
+      if(gitfile)writeFileSync(marker,'gitdir: /fixture/administration\n');
+      else{mkdirSync(join(marker,'objects'),{recursive:true});mkdirSync(join(marker,'refs'));writeFileSync(join(marker,'HEAD'),'ref: refs/heads/main\n');}
+      const file=join(home,'.config/iglo.mem/credentials.json');const old=readFileSync(file);
+      expect(()=>resolveCredential(home,'')).toThrow('Saved credentials');
+      expect(()=>saveCredential('replacement-dummy',home)).toThrow('Saved credentials');
+      expect(readFileSync(file)).toEqual(old);
+      const result=await cli(repository(),home,['init']);
+      expect(result.exit).toBe(1);expect(result.value.error.code).toBe('CREDENTIALS_INVALID');
+      expect(readFileSync(file)).toEqual(old);
+      expect(resolveCredential(home,'override-dummy')?.source).toBe('environment');
+    }
+  }
+});
