@@ -138,6 +138,9 @@ export async function runUnit(
   // A separate exclusive claim avoids two runners repeating a paid observation.
   const claim = await open(`${path}.claim`, 'wx', 0o600);
   try {
+    // Another runner may have completed between the first check and this claim.
+    if (await Bun.file(path).exists())
+      return parseObservation(await Bun.file(path).json(), identity, unit);
     const result = parseObservation(await execute(identity), identity, unit);
     await publishOnce(path, result);
     return result;

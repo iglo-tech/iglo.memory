@@ -13,7 +13,10 @@ export function protectedLiterals(question: string): string[] {
     if (literal.length) literals.add(literal);
     return ' ';
   });
-  for (const token of withoutQuotes.match(/[\p{L}\p{N}_./:@-]+/gu) ?? []) {
+  for (const raw of withoutQuotes.match(/[\p{L}\p{N}_./:@-]+/gu) ?? []) {
+    // Unquoted terminal full stops/colons are sentence punctuation. Backticks
+    // above preserve literals that actually end with those characters.
+    const token = raw.replace(/[.:]+$/, '');
     if (
       (/[\p{L}\p{N}]/u.test(token) && /[_./:@-]/.test(token)) ||
       /[\p{Ll}\p{N}]\p{Lu}|\p{Lu}{2}\p{Ll}/u.test(token) ||
@@ -163,8 +166,9 @@ export async function probeChat(
         body: JSON.stringify(payload),
       });
       if (response.ok) {
+        const text = await response.text();
         try {
-          body = await response.json();
+          body = JSON.parse(text);
         } catch {
           ensureTime();
           throw new StageFailure(code, 'invalid_response');

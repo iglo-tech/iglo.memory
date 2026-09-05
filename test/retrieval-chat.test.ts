@@ -125,3 +125,52 @@ test('permanent errors and Retry-After beyond budget never retry; total timeout 
     probeChat('expansion', request('expansion', 'p', 'q'), 'fixture', performance.now() - 1),
   ).rejects.toThrow('SEARCH_TIMEOUT');
 });
+
+test('ordinary sentence punctuation is not a protected literal; quoted endings survive', () => {
+  expect(protectedLiterals('Explain how preparation works.')).toEqual([]);
+  expect(
+    expansions({ queries: ['Describe the preparation process'] }, 'Explain how preparation works.'),
+  ).toEqual(['Describe the preparation process']);
+  expect(protectedLiterals('Read .agent/auth.md. Check API_KEY_MISSING: then `literal.`')).toEqual([
+    'literal.',
+    '.agent/auth.md',
+    'API_KEY_MISSING',
+  ]);
+});
+test('body stream resets retry but successfully received malformed JSON does not', async () => {
+  let calls = 0;
+  const result = await probeChat(
+    'expansion',
+    request('expansion', 'p', 'question'),
+    'fixture',
+    performance.now() + 3000,
+    async () => {
+      calls++;
+      return calls === 1
+        ? new Response(
+            new ReadableStream({
+              start(controller) {
+                controller.error(new TypeError('connection reset'));
+              },
+            }),
+          )
+        : Response.json(envelope({ queries: [] }));
+    },
+  );
+  expect(result.attempts).toBe(2);
+  expect(calls).toBe(2);
+  calls = 0;
+  await expect(
+    probeChat(
+      'expansion',
+      request('expansion', 'p', 'question'),
+      'fixture',
+      performance.now() + 3000,
+      async () => {
+        calls++;
+        return new Response('{');
+      },
+    ),
+  ).rejects.toThrow('invalid_response');
+  expect(calls).toBe(1);
+});
