@@ -149,9 +149,21 @@ needed to mark the timing sample representative.
 `report.ts::compare` computes paired metrics from query means. Callers must first
 check matching corpus/label hashes and cache regimes; differing systems are the
 intended comparison, differing inputs are not. The pure summary/comparison functions
-have hand-calculated fixtures. A joined artifact CLI and blinded adjudication imports
-remain T01 work. Candidate
-recall, all cache regimes and preparation-edit experiments also remain incomplete.
+have hand-calculated fixtures. Join two saved native runs with:
+
+```sh
+bun scripts/retrieval-eval/join.ts /evaluation/join.json
+```
+
+The JSON config supplies absolute `manifest`, `corpusRoot`, `labels`, `firstRun`,
+`secondRun` and `output` paths. Run directories must be their original hash names.
+The join verifies frozen corpus/labels, comparator pins, repetition counts and
+matching cache descriptions, then recalculates scores from raw observations.
+Missing units remain explicit; changed or corrupt records are never repaired.
+Joined artifacts include raw-record hashes and publish without overwriting prior
+reports. Matching descriptions still require inspection of actual cache/stage
+evidence. Blinded adjudication imports, candidate recall and all cache regimes
+remain T01 work. Preparation-edit experiments require separate retained evidence.
 No report from this checkpoint can pass F06 or a release gate.
 
 ## T02 contract fixtures
