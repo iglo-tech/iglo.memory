@@ -266,3 +266,21 @@ test('stock QMD clipping maps presented prefix without swallowing source ellipse
     )[0]?.end,
   ).toBe(300);
 });
+
+test('partial surrogate excerpts require adjudication rather than full-code-point credit', async () => {
+  const { qmdExcerpts } = await import('@/scripts/retrieval-eval/scoring');
+  const body = 'a'.repeat(296) + '😀suffix';
+  expect(
+    qmdExcerpts(
+      [{ file: 'qmd://p/a.md?index=p', snippet: '@@ -1,1 @@\n' + body.slice(0, 297) + '...' }],
+      'p',
+      new Map([[`p/${source}`, body]]),
+    )[0],
+  ).toMatchObject({ mapping: 'adjudication', start: null, end: null });
+  expect(mapExcerpt(source, '\ude00suffix', '😀suffix').mapping).toBe('adjudication');
+  expect(mapExcerpt(source, '😀', '😀suffix')).toMatchObject({
+    mapping: 'exact',
+    start: 0,
+    end: 1,
+  });
+});

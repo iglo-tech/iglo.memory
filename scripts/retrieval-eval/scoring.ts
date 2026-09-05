@@ -22,6 +22,14 @@ export function mapExcerpt(source: string, text: string, body: string | undefine
   if (!body || !text) return base;
   const offset = body.indexOf(text);
   if (offset < 0 || body.indexOf(text, offset + 1) >= 0) return base;
+  const bisectsPair = (at: number) =>
+    at > 0 &&
+    at < body.length &&
+    body.charCodeAt(at - 1) >= 0xd800 &&
+    body.charCodeAt(at - 1) <= 0xdbff &&
+    body.charCodeAt(at) >= 0xdc00 &&
+    body.charCodeAt(at) <= 0xdfff;
+  if (bisectsPair(offset) || bisectsPair(offset + text.length)) return base;
   const start = Array.from(body.slice(0, offset)).length;
   return { ...base, start, end: start + Array.from(text).length, mapping: 'exact' };
 }
