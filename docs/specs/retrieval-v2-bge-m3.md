@@ -1,5 +1,8 @@
 # Retrieval v2 — BGE-M3 direction amendment
 
+Status: superseded by the user-approved [Qwen hybrid stack](retrieval-v2-qwen.md).
+Retained as decision history; its serving/provider gate is no longer active.
+
 ## goal
 
 Use BGE-M3 as the retrieval model, replacing the planned OpenAI-small plus

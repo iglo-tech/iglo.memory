@@ -1,7 +1,8 @@
 # Retrieval v2 specification
 
-Direction update: [BGE-M3 amendment](retrieval-v2-bge-m3.md) supersedes conflicting
-embedding/BM25 choices and reduces further QMD execution.
+Current direction: [approved Qwen hybrid stack](retrieval-v2-qwen.md) supersedes
+conflicting model, expansion, reranking and capacity choices below. The current
+task frontier is in [delivery](retrieval-v2-delivery.md).
 
 Evaluation authority: the [agent evaluation amendment](retrieval-v2-agent-evaluation.md)
 supersedes human testing, review and custody requirements below.
