@@ -101,3 +101,16 @@ Correct reviewed additions resolve previously unknown evidence, retain duplicate
 unit suppression, and distinguish judged misleading output from unknown harm.
 Verify with controlled fixtures and saved native observations, then apply all
 three independent code reviewers to the same snapshot.
+
+## Comparative quality target
+
+The user's clarified outcome is retrieval quality at least as good as stock full
+QMD, with better accuracy as the goal. Model capability alone does not establish
+this outcome: evaluate the evidence actually returned on identical frozen
+questions, source corpora and relevance judgments, including unanswerable cases.
+T06 must include explicit QMD-relative quality gates alongside baseline improvement;
+baseline improvement alone cannot establish release readiness. Freeze numerical
+metrics, tolerances and uncertainty handling before held-out access. Preserve
+per-project/slice results and false-positive judgments, and retain no-rollout
+outcomes for failed or inconclusive gates. No QMD parity or superiority is claimed
+by the current partial development evaluation.
