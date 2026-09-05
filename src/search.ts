@@ -6,13 +6,19 @@ import { collect, loadVectors, readSnapshot, type Snapshot } from './store';
 
 const normalized = (text:string)=>text.toLowerCase().replace(/\s+/g,' ').trim();
 const tokens = (text:string)=>new Set(normalized(text).match(/[\p{L}\p{N}_]+(?:[./:@-][\p{L}\p{N}_]+)*/gu) ?? []);
-const norm = (values:number[])=>Math.sqrt(values.reduce((sum,value)=>sum+value*value,0));
-export function rank(snapshot:Snapshot,vectors:Map<string,number[]>,query:string,queryVector:number[]) {
+function norm(values: ArrayLike<number>): number {
+  let sum = 0;
+  for (let i = 0; i < values.length; i++) sum += values[i]! * values[i]!;
+  return Math.sqrt(sum);
+}
+export function rank(snapshot:Snapshot,vectors:ReadonlyMap<string,ArrayLike<number>>,query:string,queryVector:number[]) {
   const queryNorm=norm(queryVector); const queryTokens=tokens(query); const phrase=normalized(query);
   const coverage=(text:string)=>{const present=tokens(text);return queryTokens.size ? [...queryTokens].filter(token=>present.has(token)).length/queryTokens.size : 0;};
   const candidates=snapshot.chunks.map(chunk=>{
     const vector=vectors.get(chunk.vector)!;
-    const cosine=vector.reduce((sum,value,i)=>sum+value*queryVector[i]!,0)/(norm(vector)*queryNorm);
+    let dot = 0;
+    for (let i = 0; i < vector.length; i++) dot += vector[i]! * queryVector[i]!;
+    const cosine=dot/(norm(vector)*queryNorm);
     const text=normalized(chunk.text);
     const score=cosine*.80+(phrase && text.includes(phrase) ? .10 : 0)+coverage(chunk.text)*.06+coverage(chunk.heading)*.03+coverage(chunk.source)*.01;
     return {chunk,score};

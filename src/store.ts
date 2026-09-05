@@ -1,8 +1,9 @@
 import { readdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
+import { endianness } from 'node:os';
 import type { Config } from './config';
 import { CHUNKER, formattedInput, sha256, type Chunk } from './chunks';
-import { BASE_URL, validVector } from './embedding';
+import { BASE_URL } from './embedding';
 import { AppError } from './errors';
 import { atomicWrite, directory, exists, missing, readBytes, record } from './files';
 
@@ -76,18 +77,29 @@ export function vectorBytes(vector: number[]): Buffer {
   vector.forEach((value, index) => bytes.writeFloatLE(value, index * 4));
   return bytes;
 }
-export function readVector(root: string, receipt: Receipt): number[] {
+const littleEndian = endianness() === 'LE';
+export function readVector(root: string, receipt: Receipt): Float32Array {
   try {
     directory(join(indexPath(root), 'vectors'));
     const bytes = readBytes(join(indexPath(root), 'vectors', receipt.vector));
     if (bytes.length !== receipt.profile.dimensions! * 4 || 'sha256:' + sha256(bytes) !== receipt.vectorHash) throw new AppError('INDEX_INVALID');
-    const values: number[] = [];
-    for (let i = 0; i < bytes.length; i += 4) values.push(bytes.readFloatLE(i));
-    return validVector(values, receipt.profile.dimensions!);
+    // Keep the validated binary storage instead of allocating boxed-number
+    // arrays and copying them again. Fall back to explicit LE decoding when
+    // the platform or buffer alignment cannot support a direct view.
+    const direct = littleEndian && bytes.byteOffset % 4 === 0;
+    const values = direct ? new Float32Array(bytes.buffer, bytes.byteOffset, bytes.length / 4) : new Float32Array(bytes.length / 4);
+    let nonzero = false;
+    for (let i = 0; i < values.length; i++) {
+      if (!direct) values[i] = bytes.readFloatLE(i * 4);
+      if (!Number.isFinite(values[i]!)) throw new AppError('INDEX_INVALID');
+      if (values[i] !== 0) nonzero = true;
+    }
+    if (!nonzero) throw new AppError('INDEX_INVALID');
+    return values;
   } catch (error) { if (missing(error)) throw error; throw new AppError('INDEX_INVALID'); }
 }
 export function loadVectors(root: string, snapshot: Snapshot, allowMissing = false) {
-  const vectors = new Map<string, number[]>(); const absent = new Set<string>();
+  const vectors = new Map<string, Float32Array>(); const absent = new Set<string>();
   for (const chunk of snapshot.chunks) {
     if (vectors.has(chunk.vector) || absent.has(chunk.vector)) continue;
     try { vectors.set(chunk.vector, readVector(root, { ...chunk, profile: snapshot.profile })); }

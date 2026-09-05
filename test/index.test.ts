@@ -86,3 +86,16 @@ test('simultaneous real command processes publish and read complete worktree-loc
   }
   expect(readFileSync(join(indexPath(second),'snapshot.json'))).toEqual(before);
 });
+
+test('binary loader retains float32 values and rejects zero/nonfinite data even with matching digest',async()=>{
+  const {readVector,vectorBytes}=await import('../src/store');const {sha256}=await import('../src/chunks');
+  const root=setup();writeFileSync(join(root,'.agent/knowledge/a.md'),'alpha');
+  await prepare(root,config,async()=>[[Math.fround(.1),Math.fround(.2)]],()=> 'dummy');
+  const snapshot=readSnapshot(root,config);const chunk=snapshot.chunks[0]!;const receipt={...chunk,profile:snapshot.profile};
+  const vector=readVector(root,receipt);expect(Array.from(vector)).toEqual([Math.fround(.1),Math.fround(.2)]);
+  const path=join(indexPath(root),'vectors',receipt.vector);
+  for(const values of [[0,0],[NaN,1],[Infinity,1]]) {
+    const bytes=vectorBytes(values);writeFileSync(path,bytes);
+    expect(()=>readVector(root,{...receipt,vectorHash:'sha256:'+sha256(bytes)})).toThrow('index is invalid');
+  }
+});
