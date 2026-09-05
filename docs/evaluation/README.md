@@ -137,7 +137,7 @@ query's judged units; incomplete pooling can change it and must be recorded. Spa
 recall counts unique positive units, facet recall their union. Useful presence is
 reported at 1/3/5/8, with supporting presence separate. Answerable errors contribute
 zero usefulness/nDCG; unanswerable errors are failures with null abstention metrics.
-Misleading rate needs explicit human judgment, even for exact source text.
+Misleading rate needs explicit reviewer judgment, even for exact source text.
 
 `pairedBootstrap` accepts paired query means, uses fixed-seed resampling and returns
 95% percentile intervals plus win/tie/loss. The per-system CLI report includes per-project/slice counts, query means,

@@ -191,7 +191,7 @@ export async function main(args: string[]) {
     identity: hash(serialize(inputs)),
     status: 'INCOMPLETE',
     blockers: [
-      'Human review/custody and pooled adjudication need evaluator signoff',
+      'Review/custody and pooled adjudication need evaluator signoff',
       'Both native comparators and all three timing regimes required',
       'Preparation reuse, full-QMD stage/model proof and paired comparison pending',
     ],

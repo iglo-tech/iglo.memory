@@ -152,7 +152,7 @@ export async function main(configPath: string) {
     inputs,
     status: 'INCOMPLETE',
     reason:
-      'Matching metadata is necessary, not proof of actual cache/model stages, human judgments, custody or release gates. No comparison approval is inferred.',
+      'Matching metadata is necessary, not proof of actual cache/model stages, reviewer judgments, custody or release gates. No comparison approval is inferred.',
     labels: labels.status,
     regime: first.regime,
     cacheFacts: first.cacheFacts,
