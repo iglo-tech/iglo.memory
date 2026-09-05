@@ -15,9 +15,9 @@
   },
   "paths": {
     "briefs": ".ai/briefs",
-    "specs": ".ai/specs",
+    "specs": "docs/specs",
     "research": ".ai/research",
-    "work": ".ai/work"
+    "work": ".ai/cezar/runs"
   },
   "domain_experts": []
 }
