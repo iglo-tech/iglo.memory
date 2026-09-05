@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "commands": {
+    "validation": [
+      "sh scripts/check.sh",
+      "npx --yes bun@1.4.2 /home/cezar/cezar/projects/iglo.mem/.agents/skills/setup/scripts/check.ts --require-setup",
+      "git diff --check"
+    ],
+    "feedback": [
+      "sh scripts/check.sh"
+    ]
+  },
+  "providers": {
+    "tracker": "github:iglo-tech/iglo.mem"
+  },
+  "paths": {
+    "briefs": ".ai/briefs",
+    "specs": ".ai/specs",
+    "research": ".ai/research",
+    "work": ".ai/work"
+  },
+  "domain_experts": []
+}

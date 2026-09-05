@@ -1,0 +1,62 @@
+[
+  {
+    "event": "acquired",
+    "pid": 21502,
+    "ms": 0.020597999999999672
+  },
+  {
+    "event": "acquired",
+    "pid": 21503,
+    "ms": 811.0625749999999
+  },
+  {
+    "event": "acquired",
+    "pid": 21505,
+    "ms": 801.0953880000001
+  },
+  {
+    "G01_contention": "PASS"
+  },
+  {
+    "event": "acquired",
+    "pid": 21510,
+    "ms": 0.020297999999999483
+  },
+  {
+    "event": "busy",
+    "ms": 5003.43258
+  },
+  {
+    "event": "acquired",
+    "pid": 21528,
+    "ms": 101.65136899999999
+  },
+  {
+    "G02_replacement_kill_cancel": "PASS"
+  },
+  {
+    "event": "acquired",
+    "pid": 21530,
+    "ms": 0.020629000000000453
+  },
+  {
+    "event": "acquired",
+    "pid": 21531,
+    "ms": 0.020919999999999384
+  },
+  {
+    "G03_directory_independence": "PASS; committed linked-worktree case not run"
+  },
+  {
+    "event": "acquired",
+    "pid": 21533,
+    "ms": 0.02070900000000009
+  },
+  {
+    "G05": "FAIL",
+    "opened_ancestor_relocated_into_worktree": true,
+    "symlink_destination_written": false,
+    "dummy_sha256": "84a946ca294c88c4d0f8e7153319784beec822d75edd6e11f683e7c1d0d98a13",
+    "mode": "0o600"
+  }
+]
