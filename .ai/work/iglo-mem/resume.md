@@ -1,17 +1,28 @@
-# Resume: iglo.mem
+# Build resume
 
-Step 4/8 specify is complete. Next workflow step: build. Full product is not implemented. Preserve full PRD §§1–18, T00–T10 and D01–D05; no no-action outcome or scope reduction exists.
+Step 5 build is partial and BLOCKED. No no-action outcome or scope reduction.
+Independent T01 argument parsing, redacted errors, physical worktree discovery
+and config validation implemented. Full CLI/credential/index code does not exist.
+12 module tests/79 assertions and strict types pass. Real Git worktree fixtures
+also resolve with no Git on the resolver process PATH. Round 1 reviews: standard
+PASS, gilfoyle PASS, ponytail CHANGES_REQUESTED (two minor resolver defects).
+Both reproduced and fixed; round 2 review is next before final checkpoint.
 
-Current frontier: build executes the disposable D03 G01–G05 proof and independent T01 startup/argument/config/tooling work. Record the chosen binding and stable lock identities in the design note before the experiment. Prefer investigating embedded Node-API; no dependency is selected or proved. Do not implement dependent secure saves/store on an assumed primitive. T01 production verification requires I01–I13 after proof; T02 E01–E07 follows T01/D03. Both vertical slices are specified, but not fully ready or verified.
+D03 embedded Node-API experiment had partial successful lock/startup evidence,
+but G05 failed when the same OS user moved an opened credential directory into
+a real Git worktree. Revalidation-before-write also failed. No prototype wired
+into production; all disposable resources removed. No full G gate passed.
+Source startup requires --config=<absolute trusted path>, with equals sign.
+D01 chunking and D03 threat-model questions were asked; no answer received.
+Do not infer consent. T01 credentials/T02 depend on D03; T03 also needs D01/D04.
+D02 release matrix and D05 ranking/benchmark remain open. T01–T10 all unfinished.
+Keep all 294 PRD coverage units; none has full product proof.
 
-The refreshed spec fixes the startup outcome: no repository dotenv or bunfig loading before CLI resolution. Source launch uses pinned Bun, --no-env-file, --no-install, trusted absolute empty --config and absolute entry point while preserving target cwd. Prove ancestor/global configuration isolation; add isolation if explicit config merges preloads. Compiled build adds --no-compile-autoload-dotenv and --no-compile-autoload-bunfig to the PRD build shape. I12 must prove both launch paths with dummy sentinels. Credentials use protected ancestor handles or a proved equivalent; static pathname checks alone do not pass I13/G05. Never lock replaced snapshot/credential data; G03 proves committed snapshots in fresh worktrees without persistent read-side index writes.
-
-Required blockers: D01 oversized intact Markdown/exact overlap before T03 (rejection is not an approved amendment); D04 populated schema/dimensions/orphan integrity before T03; D02 release/security/TTY/clean-target evidence before T08 (retain Linux x86_64/arm64, macOS x86_64/arm64, Windows x86_64 candidates); D03 bundled stable locks and secure traversal before dependent T01/T02 work; D05 ranking/snippets/corpus/benchmark before T05/T09. No user answer blocks the next experiment. Seek a product decision at its frontier if evidence requires changing the PRD. Later task details remain provisional; their requirements remain mandatory.
-
-Branch: `cez/32300cb2`. Worktree: `/home/cezar/cezar/projects/iglo.mem/.ai/cezar/worktrees/32300cb2-2dd7-4247-916f-58dd56d533ae`. Inspected base HEAD: `12f3514c91ae138f0c7c4729224c4279065b278f`. Last product-verified commit: none. No commit, issue, PR or tracker task created; existing staging preserved. Prior planning origin: `eb51ee25b06dd8faacbb03e8fcdbaee84e5da77b`; other worktree untouched.
-
-Artifacts: `.ai/specs/iglo-mem-next.md`; `.ai/work/iglo-mem/plan.md`, `coverage.md`, `resume.md`, `evidence/specify.md`; `.ai/briefs/iglo-mem.md`, `iglo-mem-design.md`; `.ai/research/prd-feasibility.md`; `.ai/skills.json`. Reserve actual D03 experiment evidence under `.ai/work/iglo-mem/evidence/D03/`; clean disposable binaries/fixtures and keep experiment evidence separate from product proof.
-
-Step 4 checks passed: unchanged PRD SHA-256 `08c10e1cc1381b05099b5e00d192c7c62f1ddae99d46b271982be01ca5942127`; 294 coverage units cover every non-heading source line, including all 44 §17 bullets and 10 numbered §18 criteria; valid 11-task DAG; required spec fields; 25 I/E/G checks; local links; setup READY; diff whitespace. All product evidence remains pending. No runtime security/lock/PTY/standalone/API/benchmark evidence was produced. Existing research is reused; refresh changing provider facts at T03/live validation.
-
-Use `npx --yes bun@1.4.2` (bare Bun absent); T01 adds real product validation commands. Maintain coverage and both resume notes at milestones. Continue delivery toward reviewable PR readiness; merge has not been requested.
+Branch cez/32300cb2 in the existing Cezar worktree. Base 12f3514; initial commit
+a90ef01. Current review-fix commit will be recorded in the external handoff/PR.
+One draft implementation PR is next; never merge. No design-only PR exists.
+Artifacts: plan.md, coverage.md, ../../specs/iglo-mem-next.md,
+evidence/T01/{verify,review-round1}.md, evidence/D03/{probe.md,events.json,startup.json}.
+Next: wait for user D01/D03 decisions; if protected same-user relocation remains
+required, investigate a stronger native/security design before writing keys.
+After D03 G01–G05 pass, complete T01 I01–I13 then T02 E01–E07; continue full DAG.

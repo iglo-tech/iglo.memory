@@ -37,11 +37,12 @@ Same-user threat scope needs a decision; agreed protection remains unchanged.
 Repeatable G05 reproduction with dummy bytes only:
 
 ```python
-import os, pathlib, tempfile
+import os, pathlib, tempfile, subprocess
 with tempfile.TemporaryDirectory(dir='/tmp') as t:
     p = pathlib.Path(t)
     safe = p/'safe'; safe.mkdir(mode=0o700)
-    repo = p/'repo'; repo.mkdir(); (repo/'.git').mkdir()
+    repo = p/'repo'
+    subprocess.run(['git', 'init', '--quiet', str(repo)], check=True)
     fd = os.open(safe, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     assert os.fstat(fd).st_ino == safe.stat().st_ino
     safe.rename(repo/'moved')  # adversary after last validation
@@ -68,3 +69,8 @@ SHA-256: C source `beb1f3afd6a8258c4aa16c3d130552ee1ff596803f5dbc8d7c6e7d590336a
 TS source `d5f5a75d0f57955a9a75ede998b5b638e2a716427bc518b8b2a0e43465b2e547`;
 binary `bb0e8e792dfc79b871eec23605b0b60fa4b4c53be57b8e19057be06a3461c13e`.
 Disposable sources/binaries/fixtures removed; no real credentials/API used.
+
+Follow-up repeated G05 with an actual git-init repository; git rev-parse confirmed
+inside-work-tree=true. Validation-before-rename still wrote dummy bytes inside
+the worktree. Exit 0 reproduces the failure; fixtures removed. Git was only used
+by the fixture harness, not the proposed runtime primitive.

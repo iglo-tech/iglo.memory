@@ -69,3 +69,20 @@ test('missing, malformed and static symlink configuration paths fail', () => {
   symlinkSync(target, path); expect(() => readConfig(root)).toThrow();
   rmSync(join(root, '.agent'), { recursive: true }); symlinkSync(fixture(), join(root, '.agent')); expect(() => readConfig(root)).toThrow();
 });
+
+test('ordinary source folders with administrative-looking names remain inside the worktree', () => {
+  const root = repo(); const source = join(root, 'fixtures'); admin(source);
+  writeFileSync(join(source, 'HEAD'), 'ordinary source text');
+  expect(resolveWorktree(source)).toBe(root);
+});
+
+test('HEAD reference grammar rejects malformed names and preserves valid detached heads', () => {
+  const root = repo(); const path = join(root, '.git', 'HEAD');
+  for (const name of ['bad..name', '.hidden', 'topic.lock', 'bad@{name', 'bad/name.', 'bad//name', 'bad name', 'bad~name', 'bad^name', 'bad:name', 'bad?name', 'bad*name', 'bad[name', 'bad\\name', 'bad\x7fname']) {
+    writeFileSync(path, `ref: refs/heads/${name}\n`);
+    expect(() => resolveWorktree(root)).toThrow();
+  }
+  for (const head of ['a'.repeat(40), 'b'.repeat(64), 'ref: refs/heads/topic/subtopic']) {
+    writeFileSync(path, head + '\n'); expect(resolveWorktree(root)).toBe(root);
+  }
+});

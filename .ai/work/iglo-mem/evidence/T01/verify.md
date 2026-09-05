@@ -24,3 +24,13 @@ UX/ux-proof=SKIPPED: no displayed or interactive product surface exists.
 Coverage/complexity/mutation tooling=NOT_CONFIGURED. Quality: subset PASS;
 full product BLOCKED. No servers or test fixtures left running.
 Next: resolve D03, implement full T01 and run I01–I13. Later scope unchanged.
+
+## Resolver review fixes
+
+Two regressions reproduced before patch: ordinary administrative-looking source
+folder rejected; invalid HEAD ref accepted. Both now pass. Current suite:
+12 tests / 79 assertions, strict types, whitespace all PASS. No changed product
+flow exists to exercise beyond these modules. Separate real `git init` and
+`git worktree add` fixtures also resolved correctly in a Bun process with
+PATH=/nonexistent and conflicting GIT_DIR/GIT_WORK_TREE; temporary repos removed.
+Review-round1.md preserves all reviewer statuses and findings.

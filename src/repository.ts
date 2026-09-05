@@ -21,10 +21,20 @@ function directory(path: string): boolean {
   return lstatSync(path).isDirectory();
 }
 
+function validHead(head: string): boolean {
+  if (/^(?:[a-fA-F0-9]{40}|[a-fA-F0-9]{64})$/.test(head)) return true;
+  if (!head.startsWith('ref: refs/')) return false;
+  const ref = head.slice(5);
+  // Git check-ref-format rules; no Git subprocess is needed at runtime.
+  return !/[\x00-\x20\x7f~^:?*\[\\]/.test(ref)
+    && !ref.includes('..') && !ref.includes('@{') && !ref.endsWith('.')
+    && ref.split('/').every(part => part.length > 0 && !part.startsWith('.') && !part.endsWith('.lock'));
+}
+
 function validateAdmin(path: string, linked: boolean): void {
   if (!directory(path)) throw new Error('invalid administrative directory');
   const head = readRegularFile(join(path, 'HEAD')).trim();
-  if (!/^(?:ref: refs\/[^\s\x00-\x1f]+|[a-fA-F0-9]{40}|[a-fA-F0-9]{64})$/.test(head)) {
+  if (!validHead(head)) {
     throw new Error('invalid HEAD');
   }
   let common = path;
@@ -69,6 +79,7 @@ export function resolveWorktree(cwd: string): string {
       // Do not mistake a bare repository nested in a worktree for that worktree.
       try {
         if (lstatSync(join(current, 'HEAD')).isFile()
+          && validHead(readRegularFile(join(current, 'HEAD')).trim())
           && directory(join(current, 'objects')) && directory(join(current, 'refs'))) {
           throw new AppError('REPOSITORY_INVALID');
         }
