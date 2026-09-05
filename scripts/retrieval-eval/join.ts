@@ -13,12 +13,15 @@ import { parseObservation, publishOnce } from '@/scripts/retrieval-eval/records'
 import { summarize, compare, type Measurement } from '@/scripts/retrieval-eval/report';
 import { baselineExcerpts, qmdExcerpts, score } from '@/scripts/retrieval-eval/scoring';
 
+import { validateAdjudication, type EvidenceReview } from '@/scripts/retrieval-eval/adjudication';
+
 type Expected = { corpusHash: string; labelsHash: string };
 export async function readRun(
   directory: string,
   expected: Expected,
   questions: Question[],
   sources: Map<string, string>,
+  review?: EvidenceReview,
 ) {
   const bytes = await Bun.file(join(directory, 'inputs.json')).text();
   const inputs = object(JSON.parse(bytes));
@@ -84,7 +87,11 @@ export async function readRun(
         question: question.id,
         repetition,
         elapsedMs: observation.elapsedMs,
-        metrics: score(question, excerpts, failed),
+        metrics: score(
+          review?.questions.get(question.id) ?? question,
+          review ? excerpts.map((e) => review.resolve(question.id, e)) : excerpts,
+          failed,
+        ),
       });
     }
   // Scores are recalculated from original immutable stdout, never copied from reports.
@@ -123,14 +130,25 @@ export async function main(configPath: string) {
   );
   const labels = validateLabels(JSON.parse(labelBytes), sources, 'development');
   const expected = { corpusHash: hash(manifestBytes), labelsHash: hash(labelBytes) };
+  check(
+    config.adjudication === undefined || typeof config.adjudication === 'string',
+    'Invalid adjudication path',
+  );
+  const adjudicationBytes =
+    typeof config.adjudication === 'string' ? await Bun.file(config.adjudication).text() : null;
+  const review =
+    adjudicationBytes === null
+      ? undefined
+      : validateAdjudication(JSON.parse(adjudicationBytes), expected, labels.questions, sources);
   const [first, second] = await Promise.all([
-    readRun(config.firstRun as string, expected, labels.questions, sources),
-    readRun(config.secondRun as string, expected, labels.questions, sources),
+    readRun(config.firstRun as string, expected, labels.questions, sources, review),
+    readRun(config.secondRun as string, expected, labels.questions, sources, review),
   ]);
   requireMatchingProtocol(first, second);
   const inputs = {
     version: 1,
     ...expected,
+    adjudicationHash: adjudicationBytes === null ? null : hash(adjudicationBytes),
     firstIdentity: first.identity,
     secondIdentity: second.identity,
     firstDigests: first.digests,
@@ -138,7 +156,7 @@ export async function main(configPath: string) {
     implementationHash: hash(
       (
         await Promise.all(
-          ['join', 'corpus', 'labels', 'records', 'scoring', 'report'].map((name) =>
+          ['join', 'corpus', 'labels', 'records', 'scoring', 'report', 'adjudication'].map((name) =>
             Bun.file(new URL(`./${name}.ts`, import.meta.url)).text(),
           ),
         )

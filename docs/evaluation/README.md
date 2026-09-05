@@ -187,3 +187,20 @@ assets. G01/G02 stay open until the complete measured protocol establishes them.
 bun test test/retrieval-eval.test.ts test/retrieval-chat.test.ts
 sh scripts/check.sh
 ```
+
+## Importing pooled judgments
+
+The optional `adjudication` path in a join config loads the version-1 contract in
+[the adjudication slice](../specs/retrieval-v2-agent-evaluation.md#t01-pooled-adjudication-slice).
+It contains `corpusHash`, `labelsHash`, reviewed `labels`, and `mappings`. Labels
+preserve the original question contract and evidence, adding newly reviewed units.
+Mappings contain `question`, `source`, exact presented `text`, code-point `start`
+and `end` (both null if unresolved), `misleading` (boolean or null), and `reason`.
+Review identities retain agent/human provenance. The two original hashes bind the
+native run inputs; the separate adjudication hash binds the revised scoring view.
+
+The join rejects changed question semantics, lost original evidence, duplicate
+mappings and coordinates that do not reproduce the exact excerpt. It rescales no
+raw score and rewrites no captured response: source evidence is scored again with
+the reviewed additions. Missing judgments remain unknown. An explicit misleading
+judgment can be recorded even when source-coordinate ambiguity remains unresolved.

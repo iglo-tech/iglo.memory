@@ -71,3 +71,33 @@ Run label validation fixtures for both reviewer kinds and rejected ledgers. Read
 source context during semantic review, preserve disagreements, hash the reviewed
 revision, execute native comparisons and retain unknowns and failures. Apply all
 three independent code-review skills to each verified implementation snapshot.
+
+## T01 pooled adjudication slice
+
+A version-1 adjudication file binds original corpus/label byte hashes to a reviewed
+30-question label revision and explicit excerpt mappings. The revision preserves
+question wording, family, answerability, facets, split and all original evidence
+units; it may add reviewed evidence units and reasons. This prevents silently
+changing the question after observing a system's result. Rejudging existing units
+requires an explicitly separate experiment, not this import path.
+
+Each mapping names question, source, exact presented text, normalized code-point
+start/end (or both null when unresolved), misleading judgment (boolean or null)
+and reason. A resolved span must reproduce the presented text exactly from frozen
+source bytes. Multiple source occurrences need an explicit reviewer selection;
+unknown or unresolved mappings never receive favorable automatic credit.
+
+The joined-report config may supply `adjudication`. Validate its hashes, reviewed
+ledger, preserved question contract, unique excerpt keys and source coordinates
+before scoring. Rescore the original immutable stdout using augmented labels and
+mappings; include the adjudication byte hash in the joined report identity. No
+native observation is rewritten or rerun merely because a judgment changed.
+Missing or incomplete judgments remain unresolved. Reports retain INCOMPLETE
+status until the rest of the comparative protocol has actual evidence.
+
+Acceptance: altered frozen hashes, question semantics, original units, unknown
+questions, duplicate mapping keys and incorrect Unicode spans are rejected.
+Correct reviewed additions resolve previously unknown evidence, retain duplicate
+unit suppression, and distinguish judged misleading output from unknown harm.
+Verify with controlled fixtures and saved native observations, then apply all
+three independent code reviewers to the same snapshot.
