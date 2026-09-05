@@ -80,7 +80,7 @@ useful evidence can already be present in a selected chunk but absent from the
 shown prefix or keyword-centered snippet. T03–T05 must verify that contextual
 passages and source-owned excerpts improve what users actually receive.
 Diagnostic report identity:
-`8bb7e84f8d66bf2a3281bd81162f934bd418aa35022bf03ad0e8d640a6e2bedb`.
+`084cdab08011b5eb85cf460f023af819a956a51a8916c6adc0e14b1ed03fa466`.
 Native recovery report identity:
 `dac5d939fdd2cadefaccd170ab084a8290b30462a3680665d1cad765cd2effae`.
 Independent report audit and remaining timing pilots are tracked in run storage;
