@@ -1,0 +1,6 @@
+{
+  "project": "32300cb2-2dd7-4247-916f-58dd56d533ae",
+  "embedding": {
+    "model": "openai/text-embedding-3-small"
+  }
+}

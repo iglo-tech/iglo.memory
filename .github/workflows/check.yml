@@ -1,0 +1,36 @@
+name: Check and build Linux executable
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install build headers and pinned dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libnode-dev
+          npx --yes bun@1.4.2 install --frozen-lockfile
+      - name: Lint, format, test and typecheck
+        run: sh scripts/check.sh
+      - name: Build standalone executable
+        run: sh scripts/build.sh
+      - name: Verify CLI, terminal and clean-machine behavior
+        run: |
+          npx --yes bun@1.4.2 --no-env-file --no-install --config=/dev/null scripts/qa-cli.ts
+          python3 scripts/qa-terminal.py
+          python3 scripts/qa-clean.py
+      - name: Package executable with its permissions
+        run: tar -C dist -czf dist/iglo.mem-linux-x64.tar.gz iglo.mem
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: dist/iglo.mem-linux-x64.tar.gz
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "categories": { "correctness": "error" },
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          { "name": "node:crypto", "message": "Use Bun.CryptoHasher or global crypto instead." },
+          { "name": "crypto", "message": "Use Bun.CryptoHasher or global crypto instead." }
+        ],
+        "patterns": [
+          {
+            "regex": "^\\.\\.?(/|$)",
+            "message": "Use @/ imports rooted at the project root; relative imports are forbidden."
+          }
+        ]
+      }
+    ],
+    "typescript/no-require-imports": ["error", { "allow": ["^@/dist/lock\\.node$"] }]
+  },
+  "ignorePatterns": ["node_modules/**", "dist/**", ".agents/**", ".ai/**", ".agent/**"]
+}
