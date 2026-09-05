@@ -1,127 +1,38 @@
 # iglo.mem delivery plan
 
-Current authority: [accepted user amendments](../../specs/accepted-amendments.md). D01 and credential threat-model decision D03 are resolved. Earlier hard size/overlap and adversarial same-user credential requirements are superseded; prior evidence/status below is historical. Product implementation and index-lock proof resume; no coverage is inferred.
+Product scope: complete for documented Linux x86_64. All T01–T10 are verified and independently reviewed at `0b9d877`. [Coverage](coverage.md): 294 original source units preserved, 292 verified, 2 user-amended with replacement behavior verified, 0 pending. Final delivery stops at PR readiness; no merge or tagged release requested.
 
-Planning status: COMPLETE as a map; product status: PARTIAL, NEEDS_HUMAN. Current frontier: implemented Linux command flows verified and reviewed at f061341; live OpenRouter proof awaits a locally configured key. D01/D03 user decisions accepted. Live-provider relevance and other release-target proof remain open. Do not interpret any prior step's DONE marker as product delivery.
+Authority: unchanged [PRD](../../../PRD.md), [accepted amendments](../../specs/accepted-amendments.md). Prior planning/probe states are historical in Git and evidence; the first foundation slice was not full completion. Shared home credentials use ordinary private atomic saves and trust same-user processes. All Markdown follows one block pipeline without hard input limits/fixed overlap. Original non-goals remain: no local models, DB, daemon, alternate provider/search mode, implicit freshness, installed schedules or full-codebase indexing.
 
-Destination: the complete [PRD](../../../PRD.md) §§1–18: standalone repository-local semantic Markdown memory with secure shared credentials, explicit incremental preparation, snapshot-only ranked search, status, safe GC and isolated worktrees.
+## Task states and acceptance evidence
 
-Scope: all positive requirements, exclusions, acceptance criteria and Definition of Done in [coverage](coverage.md). No no-action outcome was recorded by intake/research/design. T00 preflight was cleared by intake evidence; D01–D05 remain open.
-
-Non-goals: PRD §3 exclusions. This delivery run retains the full plan; step 4 specifies only, without production code or tracker creation. Continue to build, then delivery toward a reviewable PR; merge is not requested.
-
-Sources: [brief](../../briefs/iglo-mem.md), [design decisions](../../briefs/iglo-mem-design.md), [research](../../research/prd-feasibility.md), [next-slice spec](../../specs/iglo-mem-next.md), [resume](resume.md). Paths are adopted in `.ai/skills.json`; pinned Bun runs through `npx --yes bun@1.4.2`. [T00 evidence](evidence/T00/setup.md) records READY; add product commands in T01.
-
-## State and evidence rules
-
-Allowed task states: `pending`, `in-progress`, `verified`, `reviewed`, `blocked`. Pending means not started; in-progress means active implementation/evidence work; verified means all task acceptance checks passed at a recorded commit; reviewed means verification plus independent review with no unresolved required findings; blocked means a listed dependency/contract prevents starting or finishing. T01–T07 have implementation/fixture verification at 002cc56; independent review is in progress. T08–T10 retain the external/platform/quality proof listed below.
-
-The next executable action is the D03 experiment (spec G01–G05), alongside independent T01 tooling. D03 has a fixed proof contract but no selected primitive; do not describe the whole T01 slice as ready.
-
-Readiness is separate from detail: T01/T02 are specified but blocked until their dependencies pass. Later task mechanics are provisional; their requirement coverage is mandatory. Move to in-progress when work actually starts. Verification must attach exact command, target/runtime, commit, sanitized result, artifacts and relevant coverage IDs. Review must attach report and resolution evidence. Reopen dependent evidence if the reviewed behavior changes. Product completion requires all requirement rows covered by reviewed tasks, full §17/18 automation, release proof and no required decision left open.
-
-## Vertical tasks
-
-| ID | State | User/system outcome and PRD links | Dependencies | Acceptance checks and eventual evidence |
+| ID | State | Delivered outcome | Dependencies | Evidence |
 | --- | --- | --- | --- | --- |
-| T00 | verified | Delivery environment can build/verify artifacts; [§15](../../../PRD.md#15-technology) | none | Preflight READY: initializer, configured paths/bootstrap checks and pinned Bun recorded in [setup evidence](evidence/T00/setup.md). Verified denotes environment preflight only at base `12f3514c91ae138f0c7c4729224c4279065b278f` with local config, not product verification. T01 must add product validation commands. |
-| T01 | reviewed | Maintainer initializes any worktree and shares/replaces credentials safely; [§5](../../../PRD.md#5-configuration), [§12](../../../PRD.md#12-cli-commands), [§14](../../../PRD.md#14-security-and-privacy) | T00, D03 (save proof) | Spec I01–I13: CLI→resolver/config→hidden entry/storage→JSON. PTY, fake home, faults and concurrent reset proof; evidence/T01. No API use. |
-| T02 | reviewed | Maintainer prepares empty sources; agent searches/inspects empty snapshot offline; [§8](../../../PRD.md#8-index-storage), [§10](../../../PRD.md#10-search-algorithm), [§12](../../../PRD.md#12-cli-commands) | T01, D03 | Spec E01–E07: prepare→atomic empty snapshot→search/status. Trace no source reads/requests/writes on read flows; publication faults/locks; evidence/T02. |
-| T03 | reviewed | Maintainer prepares nonempty canonical Markdown and inspects complete persisted data; [§§6–9](../../../PRD.md#6-embedding-profile) | T02, D01, D04 | Given heading/code/Unicode fixtures, prepare yields deterministic source/text/line/hash records; batches of 64 missing inputs map out-of-order responses by index; valid LE float32 files and snapshot publish together. Exclusions/symlinks/source integrity, missing credentials, permanent/transient failures, timeout/body/index/dimension/zero/nonfinite faults all tested. Status reports complete counts. Evidence/T03; freeze full schema before implementation. |
-| T04 | reviewed | Repeated preparation reuses valid data and safely refreshes edits/deletions/profile changes; [§9](../../../PRD.md#9-explicit-data-preparation) | T03 | Given prepared data, unchanged run makes zero document calls; one edited section re-embeds only affected inputs; deletions become visible only on successful commit; missing/corrupt index repairs explicitly; incompatible profiles never reuse; orphan evidence and dimension transitions tested. Failed refresh leaves prior complete snapshot. Evidence/T04. |
-| T05 | reviewed | Agent gets relevant ranked prepared snippets from one query without source access; [§§10–11](../../../PRD.md#10-search-algorithm) | T03, D05 | Given fixed semantic/exact/no-match corpus and controlled query vectors, search returns deterministic file-deduplicated top ≤8 with full PRD fields. Trace only one query input, no source reads/freshness/repair/writes; changed/deleted/unreadable sources preserve prepared text. Missing/corrupt/incompatible active data and API failure give errors without partial/lexical fallback. Evidence/T05. |
-| T06 | reviewed | Maintainer inspects damaged availability and safely reclaims unused vectors; [§12](../../../PRD.md#12-cli-commands) | T04, T05 | Given valid metadata and missing files, status reports availability without source reads/API/mutation. Present corrupt vector fails explicitly. GC validates reference authority before deletion, preserves every active vector after source deletion, refuses invalid/missing snapshot, and deletes only recognized unreferenced artifacts under lock. Evidence/T06. |
-| T07 | reviewed | Agents and cron safely operate across worktrees and interrupted concurrent processes; [§13](../../../PRD.md#13-multiple-worktrees), [§18](../../../PRD.md#18-definition-of-done) | T04, T05, T06, D03 | Given two linked worktrees and simultaneous prepare/search/gc, results stay local; lock wait bounded; search continues from loaded data while later GC runs; no partial vector/snapshot visibility under failure/termination; no live-lock theft/PID reuse race. Include saved-key cron without shell startup, branch switching without implicit refresh and committed snapshot loading. Evidence/T07. |
-| T08 | in-progress | User downloads and runs one executable per supported target with secure setup; [§15](../../../PRD.md#15-technology), [§17 installation](../../../PRD.md#installation) | T07, D02 | Compile with explicit disabled dotenv/bunfig startup loading (reconcile PRD bare example), target flags for additional artifacts; clean target VM has no Bun/Node/npm/Git/dependencies on PATH; run all five commands, PTY/reset/permission and concurrency suite on every promised target. No stubs/FEATURE_NOT_READY remain. Evidence/T08. Packaging design only until matrix is resolved; no publication implied by this plan. |
-| T09 | in-progress | Agent searches 10,000 active chunks within PRD local latency budget and with useful ranking; [§16](../../../PRD.md#16-performance-requirements) | T05, T08, D05 | Named hardware/OS/Bun/model/dimensions, cold/warm timing and raw runs prove local load/validate/rank/output <1 second excluding only remote query wait; active-only reads, zero document calls/source reads. Semantic/paraphrase/identifier/no-match evaluation distinguishes real-model results from mock contract tests. Evidence/T09. |
-| T10 | in-progress | Maintainer has documented setup/refresh/search/cron/recovery/privacy and complete release acceptance evidence; [§14](../../../PRD.md#14-security-and-privacy), [§§17–18](../../../PRD.md#17-acceptance-criteria) | T08, T09 | Run every §17/18 automated scenario; document plaintext user credentials and remote document/query disclosure, explicit freshness, model/config change recovery, errors, gc, runtime install/target limits and externally managed scheduling. Update every coverage row with verified commit/evidence and review status. No product-complete claim before all required findings close. Evidence/T10. |
+| T00 | verified | Build/verification environment and pinned Bun available | none | [Preflight](evidence/T00/setup.md); hosted build proof |
+| T01 | reviewed | init/config/discovery; shared credentials, hidden setup/reset, environment precedence, cancellation and private atomic saves | T00,D03 | [PTY](evidence/resumed/terminal-ci-fix.json), [35 tests/types](evidence/resumed/checks-ci-fix.txt), [12k concurrent saves](evidence/resumed/concurrent-save-after.json), test/credentials.test.ts |
+| T02 | reviewed | Empty prepare/search/status; atomic snapshot, no reader source/API/write side effects | T01,D03 | [CLI](evidence/resumed/cli-ci-fix.json), [downloaded binary](evidence/resumed/downloaded-artifact.json), test/index.test.ts |
+| T03 | reviewed | Deterministic Markdown, canonical input hashes, indexed OpenRouter responses, binary vectors and complete publication | T02,D01,D04 | test/chunks.test.ts, test/embedding.test.ts, test/index.test.ts; [live batch](evidence/resumed/live-openrouter.json) |
+| T04 | reviewed | Incremental reuse/refresh/deletions/profile isolation, orphan recovery, failed refresh preserves snapshot | T03 | [CLI](evidence/resumed/cli-ci-fix.json), [tests](evidence/resumed/checks-ci-fix.txt), [live unchanged prepare](evidence/resumed/live-openrouter.json) |
+| T05 | reviewed | Snapshot-only semantic/lexical ranking, file deduplication, bounded snippets, explicit errors with no fallback | T03,D05 | test/ranking.test.ts, test/index.test.ts; [live ranking/unreadable sources](evidence/resumed/live-openrouter.json) |
+| T06 | reviewed | Status without source access/API; reference-safe GC and corrupt authority rejection | T04,T05 | [CLI](evidence/resumed/cli-ci-fix.json), test/index.test.ts; [live status/GC](evidence/resumed/live-openrouter.json) |
+| T07 | reviewed | Worktree isolation, bounded OS locks/process-exit recovery, simultaneous commands, committed snapshots and saved-key cron-style preparation | T04,T05,T06,D03 | test/lock.test.ts, test/index.test.ts; [PTY worktree reuse](evidence/resumed/terminal-ci-fix.json), [live no-shell setup](evidence/resumed/live-openrouter.json) |
+| T08 | reviewed | Downloadable standalone Linux x86_64 executable with embedded native lock binding | T07,D02 | [CI/downloaded artifact and clean Debian all-five-command proof](evidence/resumed/downloaded-artifact.json); [final verification](evidence/resumed/verify-final.md) |
+| T09 | reviewed | Relevant semantic/exact results and <1s local search at10k chunks on measured runner | T05,T08,D05 | [live ranking](evidence/resumed/live-openrouter.json), [100 warm+20 cold-requested runs per dimension](evidence/resumed/performance-summary.json), max524/629ms |
+| T10 | reviewed | README setup/privacy/refresh/cron/recovery/install instructions, all acceptance and DoD evidence reconciled | T08,T09 | [coverage](coverage.md), [72 remaining-row audit](evidence/resumed/coverage-audit.json), [final review](evidence/resumed/review-final.md), [README](../../../README.md) |
 
-Evidence paths above are reserved destinations, not existing passing artifacts. Tests belong in each vertical task; T07/T10 add cross-flow proof rather than postpone all testing to the end.
+Every task uses the final cumulative [product verification](evidence/resumed/verify-final.md) and [three-lane review](evidence/resumed/review-final.md); mapped requirement IDs remain in coverage. Test source paths above are repository-root relative. Earlier proof is retained where source is unchanged; final credential and CI harness fixes were reverified and reviewed. No unresolved required finding, check, conflict or repository approval can be skipped at readiness.
 
-## Decision map and blocking edges
+## Decision map
 
-| ID | State | Contract / next action | Blocks |
-| --- | --- | --- | --- |
-| D00 | resolved | Preserve full PRD, narrow responsibilities and explicit snapshot freshness. First implementation target Linux x86_64 is an experiment/development choice, not a release scope reduction. Evidence: brief/design/research. | none |
-| D01 | resolved by user; older rationale follows | §7 cannot keep an indivisible >5,000-character block intact under a 5,000 cap; exactly 500 overlap may also cut an intact block/paragraph. Before T03, run shape/deep-design on accepted-input semantics; use the prior fail-before-publication proposal as an explicit option, not an approved amendment. If the PRD owner must choose rejection versus changed splitting rules, ask then and retain the blocker until answered. | T03, descendants |
-| D02 | unresolved required | Candidate proof matrix: Linux x86_64/arm64, macOS x86_64/arm64, Windows x86_64. This is retained investigation scope, not a support promise or exclusion of other targets. Research current Bun target/minimum-OS constraints; prove bundled owner-only ACL/no-follow/TTY/locking/rename on candidates; record exact supported OS versions/architectures before release. Unsupported candidates require an explicit scope decision, not silent deletion. Windows ACL capability remains unproved. | T08, release |
-| D03 | revised contract verified on Linux; older rationale follows | Contract: exclusive worktree-local lock, 5-second acquisition limit, automatic ownership release on process exit, stable identity, no age-based theft, no search mutation of snapshot/vectors, and committed-snapshot usability without persistent search writes. Deep-design plus disposable multi-process experiment must select a bundled OS primitive and show release/recovery/replacement safety on Linux before T02 and for shared credential saves in T01; repeat on release targets. Keep credential/index identity separate from replaced data; compare embedded Node-API against FFI and prove safe ancestor traversal. If unavailable, redesign before store implementation. Do not adopt unlink/recreate stale lockfiles based on PID/age. | T01 saves, T02, T07, T08 |
-| D04 | implemented/fixture verified; older proposal follows | Freeze populated snapshot/vector/hash/canonical profile and cache-dimension bootstrap rules before T03. Starting proposal below; deep-design review must address orphan crash points and corruption evidence. | T03 |
-| D05 | algorithm verified; live quality open | Freeze exact ranking constants/tokens/snippet semantics and benchmark environment before T05. Starting proposal below is reversible and must be evaluated, not treated as quality evidence. Pin actual benchmark hardware and target dimensions before claiming performance. | T05, T09 |
+| ID | State | Resolution |
+| --- | --- | --- |
+| D00 | resolved | Preserve all PRD functional scope and explicit snapshot freshness. |
+| D01 | resolved by user | No hard length rejection or size classes. One heading/paragraph/code-block pipeline, soft5000 grouping target, intact oversized blocks, no exact overlap. Revised R07-07/08 tested. |
+| D02 | resolved for PR | Supported Linux x86_64, verified locally and through hosted downloaded build. PRD names no multi-platform matrix; earlier candidates remain future unverified ports. No tagged release during finish. |
+| D03 | resolved and verified | Simple shared outside-Git credential file with private permissions/atomic saves; no adversarial same-user framework. Separate small bundled POSIX directory flock provides index consistency and automatic release. |
+| D04 | resolved and verified | Canonical profile/input/content identities, snapshot/receipt/vector validation and safe orphan reuse as implemented and tested. |
+| D05 | resolved and verified | Fixed cosine/lexical weights and threshold, stable dedup/order,400-char output excerpts; real-provider ranking and measured end-to-end local latency pass separately. |
 
-D01/D02 are inherited blockers; no-action/scope decisions are not invented. D03/D04/D05 keep later slices from claiming contracts are finished. T00 preflight is complete. T01 launch/argument/config/tooling work can progress without a user decision; credential-save verification depends on D03. At the next frontier resolve only the decisions needed for its slice through shape/research/deep-design, then add its detailed spec. Use existing research; refresh only external facts actually needed for a decision.
+Historical design/provisional contracts: [design](../../briefs/iglo-mem-design.md), [research](../../research/prd-feasibility.md), [original slice spec](../../specs/iglo-mem-next.md). Where they conflict, accepted amendments and verified final contract govern. Historical failed feasibility probes are preserved, not treated as current work after the user's clarification.
 
-## Provisional later contracts (not implementation-ready)
-
-### T03: chunking, transport and storage
-
-Proposed parser: LF normalization (CRLF and lone CR), Unicode code-point content count, ATX and Setext headings outside fenced/indented code, section from each heading to the next; headingless preamble has empty heading; heading text is separate metadata, section content excludes its heading line. Empty sections produce no chunk. Lines are one-based inclusive prepared-source bounds; overlap positions map back to the original normalized lines. Prefix is exactly PRD §7 with LF separators; cap excludes prefix. Preserve paragraph/code bytes and never silently truncate. D01 must settle oversized atoms, exact overlap crossing atoms, terminal newlines, heading hierarchy/text normalization and fence grammar with golden fixtures before assigning the v1 chunker name to populated data.
-
-Transport proposal: sequential batches of up to 64, final partial batch; query is one array element; exact PRD HTTPS endpoint/model/float body with bearer key. Maximum 4 attempts per request, 30 seconds per attempt including body read, 120-second overall batch/query deadline. Backoff 1, 2, 4 seconds with Retry-After taking the greater delay; accept integer seconds or HTTP date, past date means zero, invalid value ignored. If delay cannot fit remaining deadline, fail rather than retry early. Retry 429/5xx and temporary network/timeout failures; permanent auth/credit/model/input failures, malformed response and other 4xx (including 408 by this proposal) do not retry. No raw response logging. Validate indices, finite nonzero vectors both before and after float32 conversion, one positive dimension across batches/query; enforce configured/snapshot dimensions. API unsupported batch/token/model behavior fails clearly without truncation, auto-discovery or publication. Fixture tests are mandatory; live calls require a later explicitly authorized test credential/budget.
-
-Identity proposal: profile serialization in next-slice spec; chunkHash = SHA-256 UTF-8 exact formatted input. Vector basename = `sha256-<digest>.f32` where digest is SHA-256 of compact JSON array `[profileId,chunkerVersion,formattedInput]`; file bytes are exactly dimensions×4 little-endian float32. Snapshot chunk records include PRD metadata, normalized text, vector basename and SHA-256 of vector bytes. Recompute IDs and validate all metadata/counts/bounds/containment, file lengths, byte digests, finite/nonzero values and dimensions before use. Reject traversal, symlink, duplicate inconsistent records, truncated and unsupported data. Repeated inputs can share a vector; chunk counts and unique-vector counts differ.
-
-Dimension/cache proposal: a structurally/integrity-valid compatible previous profile establishes dimensions without API calls. Otherwise first missing-input response establishes them; do not infer profile from byte length alone. Persist atomic per-vector receipt metadata containing profile settings, input hash and byte digest to support reuse of valid orphan vectors from interrupted publication. Orphan with missing/inconsistent receipt is not trusted: re-embed or leave for GC. Freeze receipt location, write ordering and selection when multiple dimensions exist in D04. Key rotation never changes profile. Empty→nonempty discovers dimensions; nonempty→empty may retain compatible known dimensions. Changed model/input/chunker/normalization yields a different profile; hidden remote revisions remain unknowable.
-
-### T05/T06: search, status and GC
-
-Initial ranking proposal: cosine×0.80; exact normalized full-query phrase bonus 0.10; unique query-token coverage in text ×0.06; heading coverage ×0.03; filename coverage ×0.01. Normalize case and whitespace for lexical comparison only, keep punctuation inside technical identifiers with a frozen token grammar. Admit a result at score ≥0.25. Compare unrounded scores, then source UTF-8 byte order, then startLine/endLine/chunkHash; choose one best chunk per file before top-eight truncation. Output score rounded to six decimals. Snippet proposal: first 400 Unicode code points of prepared chunk text plus ellipsis if truncated, never load or assemble a full document. D05 must resolve a short one-chunk document versus §11's full-document prohibition and freeze exact token/phrase boundaries. Corpus must include refresh-token paraphrase, equal-cosine exact identifier advantage, repeated chunks in one file, ties, and zero/negative-similarity no-match queries. Tune constants only before contract freeze or through explicit spec change; no user ranking knobs.
-
-Status proposal: structurally valid compatible snapshot with missing vector files returns PRD counts; `vectors` counts valid unique referenced files and `missingVectors` unique absent files, not chunks; corrupt present files fail INDEX_INVALID. GC must first validate complete compatible snapshot and every referenced vector; missing/invalid/incompatible authority fails without deletion. Remove only recognized unreferenced vector artifacts/receipts, never sources, snapshot, lock or arbitrary files. Proposed result `{project,removedVectors,retainedVectors}` counts unique vectors. Partial unlink failure must return a stable error with no false all-or-nothing claim; no active vector may be affected. Freeze temp/orphan receipt policy and partial failure schema in T06 spec.
-
-### T09: performance and relevance evidence
-
-Measure the actual compiled binary, 10,000 active chunks, 1,536 and 3,072 dimensions, plus one explicitly selected alternate-model fixture dimension. Local timer includes config/snapshot validation, referenced-vector reads/digest checks, query request serialization/response validation, cosine/lexical ranking and JSON output; subtract only measured remote wait. Report lock waiting separately and show uncontended total. Use 20 cold-cache and 100 warm-cache runs, report all raw durations plus min/median/p95/max, require each uncontended measured local total under one second. Record CPU model/core allocation, RAM, filesystem/storage, OS version, Bun/binary revision and cache reset procedure. No named hardware is established yet; D05 must select and record a reproducible runner before measurement. A hot inner loop alone does not prove §16. Live semantic quality and mocked algorithm correctness are distinct evidence; document model/date/corpus if authorized live evaluation is later run.
-
-## Current frontier and handoff
-
-- Current: step 6 frontier audit complete; T00 preflight READY, partial T01 modules reviewed, T01–T10 blocked. D01–D05 remain open.
-- Next: build runs the spec D03 G01–G05 disposable proof, records the binding/identity decision and adds independent T01 tooling/startup controls. Implement secure saves only after proof; verify I01–I13, then T02 E01–E07. Retain full T00–T10 coverage.
-- Required open questions: D01 chunk acceptance, D02 release/platform security, D03 lock feasibility, D04 populated cache contract, D05 quality/performance details. None requires user input to finish this planning step.
-- Branch: `cez/32300cb2`; base HEAD: `12f3514c91ae138f0c7c4729224c4279065b278f`.
-- Last product-verified commit: **none**. Base commit was inspected, not tested as a product.
-- Artifact paths and continuation context: [resume](resume.md). Keep CEZ_HANDOFF_FILE synchronized at each meaningful delivery milestone.
-
-Step 5 frontier: D03 selected custom embedded Node-API directory-lock experiment; independent T01 argument/resolver/config modules in progress. T01 completion remains gated by D03.
-
-Step 5 result: independent T01 argument/config/resolver modules pass 10 tests and strict types (evidence/T01/verify.md). D03 probe failed G05 relocation containment; immediate revalidation also failed (evidence/D03/probe.md). T01 credential work and dependent tasks remain blocked. D01 and D03 user decisions pending; D02/D04/D05 unchanged. No task T01–T10 or full requirement is verified.
-
-Checkpoint: implementation da10482 passes all three independent round-2 reviews (evidence/T01/review-round2.md); 12 tests/79 assertions and strict types pass. Draft PR #1: https://github.com/iglo-tech/iglo.mem/pull/1. This is partial module acceptance only; no T01–T10 task/PRD row is complete. Next action awaits D01/D03 decisions; resume.md pins the exact frontier.
-
-Step 6: final verification NOT ENTERED because no product task is reviewed. At fd19c82, 12 tests/79 assertions, strict types, setup and whitespace pass; implementation matches reviewed da10482. All 294 coverage rows remain pending. [Gate report](evidence/final-verification/report.md) records scenarios, uncovered IDs and skipped integrated proof. Status NEEDS_HUMAN; retain D01/D03 decisions and all downstream blockers.
-
-## Resumed implementation — current frontier
-
-At 002cc56 all five commands exist. [Verification](evidence/resumed/verify.md)
-and raw CLI/PTY/container/test artifacts establish implemented Linux flows.
-T01–T07 states above refer to that environment and controlled transport, not
-real-provider semantics. All three independent reviews are running on the
-original-base cumulative diff. The older step logs and planned next actions
-above are historical, superseded by this frontier and the accepted amendments.
-
-T08: compiled Linux x86_64 binary passes clean Debian/no-runtime/network-disabled
-checks; candidate other platforms remain unverified and no release published.
-T09: 10k/1536 dimensions passed 100 warm and 20 fadvise-cold local runs; larger
-vector initial samples pass. Real HTTP/local-overhead and live semantic quality
-remain unverified. No OpenRouter key is configured and no live budget supplied.
-T10: README covers setup/privacy/cron/refresh/recovery; release acceptance remains
-partial. Do not promote the full PRD or merge. Next: address independent reviews,
-repeat verification for changed behavior, then finish with the exact remaining
-external proof. D01/D03 are no longer pending user answers.
-
-## Finish frontier after resumed reviews
-
-Implementation f061341 passes all three final implementation lanes after
-product verification. Credential containment and loader performance defects
-were reproduced, fixed, reverified and reviewed. T01–T07 are reviewed in the
-recorded Linux/controlled-transport scope. All D01/D03 owner decisions are
-resolved; do not ask those questions again.
-
-Coverage: 220 Linux/controlled-fixture rows verified, 2 user-amended rows tested,
-72 full-scope acceptance rows pending. Exact IDs: evidence/resumed/frontier.json.
-The entire PRD is not complete. T08–T10 retain live-quality, release-platform
-and final integrated acceptance work. Existing code has no open review finding.
-Next external input is an OpenRouter key configured locally (not pasted into
-chat); then run a small real fixture batch and two search queries and finish
-the remaining requirement audit. PR #1 stays draft; no merge requested.
-Canonical PR: https://github.com/iglo-tech/iglo.memory/pull/1 (repository moved).
+Next: final pushed-head checks, mark existing PR #1 ready. No merge/cleanup of this active worktree or user-owned .agent is authorized or needed. No configured release/follow-up hooks. Future ports require their own proof before support claims.

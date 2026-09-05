@@ -1,6 +1,6 @@
 # Final product verification
 
-Status: VERIFIED locally on Linux x86_64; CI artifact verification pending.
+Status: VERIFIED on Linux x86_64, including live API and downloaded CI executable.
 Snapshot: accompanying credential-race fix commit; earlier production source f061341 unchanged except credentials.ts validation.
 
 Live OpenRouter: live-openrouter.json proves compiled document embedding (3 inputs), unchanged preparation (0 new inputs), semantic paraphrase and exact-term query ranking (2 queries), saved-key use without environment/shell setup, unreadable-source search, status/GC and unchanged credentials/source/snapshot. No more live calls required for the isolated credential stat fix.
@@ -15,6 +15,8 @@ New committed-snapshot linked-worktree/concurrent search/long snippet test passe
 
 Retained current evidence: verify.md, verify-round2.md, verify-round3.md; all raw CLI, terminal, concurrency, integrity and benchmark artifacts. performance-summary.json records 100 warm and 20 OS-eviction-requested cold runs per dimension (10,000 chunks, 1536/3072); max 524/629ms. Ranking/vector code unchanged; remote latency excluded. Other OS/CPU ports are unverified future work under accepted-amendments.md (PRD has no OS matrix).
 
-Pending: real GitHub checks, download its Linux executable artifact and run clean-container verification; independent final reviews. No merge requested. Fixture homes/repos/containers cleaned. User-created untracked .agent remains untouched.
+Final independent reviews: all three PASS (review-final.md); 294-row coverage audit complete. Finish must recheck provider state after final metadata push. No merge requested. Fixture homes/repos/containers cleaned. User-created untracked .agent remains untouched.
 
 CI follow-up: at 3a521ae, run33963961228 passed tests/build/PTY but clean QA failed. Standard and Ponytail found the harness hardcoded UID1000 for a private fixture owned by the invoking user. qa-clean.py now uses os.getuid()/getgid() and surfaces both JSON stdout and stderr on failure. Local clean container rerun PASS; hosted-runner verification follows. Production binary is unchanged by this harness correction.
+
+Final hosted proof at 0b9d8770aa2251cdb6edf28b4ebbc958f79fa41e: GitHub runs 33964026774 (push) and 33964028645 (PR) both SUCCESS, including 35 tests/types, compile, PTY and clean-container QA, packaging/upload. Downloaded artifact9968846191 from run33964026774; archive SHA256 matches GitHub digest; single executable mode0755, binary SHA25685daf3ab0c27af555831ba98cc527f86d878b28613f9ef2934bca5511c88d76d. All five commands pass from this downloaded binary in the pinned clean Debian container with no runtimes/Git/network. See downloaded-artifact.json. Artifact fixtures removed. This resolves the UID harness finding and downloadable-installation proof.

@@ -1,26 +1,5 @@
 # Delivery resume
 
-Implementation reviewed: f061341a61c5e7414fc1ad0db9ecfa34f13a34bf, base 12f3514.
-User D01/D03 answers applied: simple shared home credentials outside repositories,
-no same-user adversarial framework; uniform soft block grouping with no input
-length rejection/exact overlap. All five CLI commands work on tested Linux.
-33 tests/279 assertions and strict types PASS; controlled CLI journey, PTY,
-clean Debian executable, data-integrity/concurrency checks PASS. All three
-independent lanes PASS after credential-containment and measured loader fixes.
-Historical findings/disagreement preserved in evidence/resumed/review-round1.md.
-Current reports: verify-round3.md, review-round3.md, finish.md, frontier.json.
-Coverage: 220 verified Linux/controlled rows, 2 superseded user-amended rows
-with revised behavior tested, 72 pending full acceptance. Full PRD remains partial.
+Full PRD implementation for Linux x86_64 verified and reviewed at0b9d877; production source3a521ae. All294 rows accounted:292 verified,2 user-amended and replacement tested,0 pending. AllT01–T10 reviewed. Live saved-key OpenRouter,35 tests/292 assertions/types,PTY,CLI,clean machine,12k saves,committed worktrees and10k-chunk latency PASS. Hosted push+PR runs33964026774/33964028645 PASS; downloaded artifact9968846191 also PASS in clean container. All three final lanes PASS; previous findings preserved.
 
-Waiting on user: no inherited or saved OpenRouter key is available. Asked user
-to run this worktree's dist/iglo.mem init locally and reply configured, never
-paste key in chat. Next: one disposable small live fixture batch plus two
-queries (semantic paraphrase and exact term), check saved-key use, response
-validation and actual ranking; retain source/snapshot evidence and clean up.
-Then audit the remaining requirement IDs and finish. Other candidate release
-platforms remain unverified; only Linux x86_64 has executable proof. No merge
-requested; keep PR draft until real remaining product gates are satisfied.
-Canonical PR #1: https://github.com/iglo-tech/iglo.memory/pull/1 (repository moved).
-Keep source/dist build available and preserve the worktree for live QA. No
-server, native experiment, fixture credential or container remains running.
-Retro report COMPLETE is not delivery completion.
+Remaining finish action: push final evidence metadata, check actual final-head runs, update existing PR #1 and mark ready. Do not merge. Other OS/CPU ports unverified future work; no tagged release. User key remains local and user-created .agent/ remains untracked; preserve both. No user input required. Finish report is delivery authority; retro COMPLETE applies only to lessons.

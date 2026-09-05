@@ -1,54 +1,25 @@
-# Resumed finish audit
+# Finish audit
 
-Status: NEEDS_HUMAN
+Status: READY_TO_MERGE
 PR: #1 (link: https://github.com/iglo-tech/iglo.memory/pull/1)
-Delivery: PARTIAL. Do not merge or mark the whole PRD complete.
-Reviewed implementation: f061341a61c5e7414fc1ad0db9ecfa34f13a34bf.
+Scope: full PRD implementation for documented Linux x86_64, under accepted user amendments.
+Reviewed and product-verified implementation/harness: 0b9d8770aa2251cdb6edf28b4ebbc958f79fa41e.
 Original base: 12f3514c91ae138f0c7c4729224c4279065b278f.
 
-Delivered implementation: all five commands; simple shared home credentials
-with environment precedence, hidden reset and atomic private saves; uniform
-Markdown blocks with no local length rejection/exact overlap; incremental
-OpenRouter transport, content-addressed float32 vectors, atomic snapshots,
-snapshot-only ranked search, status and reference-safe GC; OS-released locks.
+Coverage: all294 stable source units retained;292 verified,2 user-amended with replacement verified,0 pending. T01–T10 reviewed. Exact evidence is in coverage.md and coverage-audit.json. Other OS/CPU candidates remain unverified future ports; PRD did not promise that exploratory matrix. No first-slice completion inference remains.
 
-Verification: 33 tests/279 assertions and strict types PASS. Real CLI journeys
-with controlled transport, PTY setup/reset/cancellation/restoration, source and
-snapshot preservation, concurrent processes and clean Debian standalone checks
-PASS. Verification reports and raw results remain in this directory.
-Standard/Gilfoyle/Ponytail all PASS after current product verification. Their
-one static credential bug and severity disagreement remain preserved; it was
-reproduced, fixed and reverified. No current code finding remains.
+Delivered: init/prepare/search/status/gc; shared private outside-Git home credentials with hidden setup/reset and environment precedence; uniform Markdown blocks without hard input limits/fixed overlap; incremental OpenRouter embeddings, content-addressed float32 vectors, atomic validated snapshots, snapshot-only ranking, reference-safe GC and OS-released worktree locks.
 
-Performance: final 10,000-chunk compiled-CLI runs PASS at both 1,536 and 3,072
-dimensions: 100 warm and 20 cache-eviction-requested runs each. Exact hardware,
-raw samples, maxima, fixture scope and binary digest are in performance-summary.json
-and referenced files. All include startup and local transport processing;
-remote response is controlled, so this is not live-provider relevance proof.
-The earlier larger-vector failure and its fix remain recorded.
+Checks:35 tests/292 assertions and strict types PASS; CLI/PTY/data-integrity/worktree/process concurrency PASS. 12,000 concurrent credential saves PASS after the CI race fix. Live saved-key OpenRouter:3 documents embedded, unchanged prepare embeds0, semantic and exact queries rank expected document first, source-unreadable search/status/GC PASS, source/snapshot/key unchanged. No real key or private user Markdown in artifacts.
 
-Coverage: 220 source-unit rows verified in the recorded Linux/controlled scope;
-2 requirements superseded by the user, with revised behavior tested; 72 pending
-full acceptance. All 294 stable IDs preserved. frontier.json enumerates pending
-rows. T01–T07 reviewed within recorded environment, T08–T10 retain full external/
-release/integrated acceptance. Do not turn this implementation into full PRD
-completion based solely on tests or review PASS.
+Performance:10,000 chunks,100 warm+20 OS-eviction-requested runs each at1536/3072 dimensions; maximum524/629ms including startup/local request-response processing, excluding remote wait. Exact hardware/raw scope in performance-summary.json. This is measured environment evidence, not an all-hardware claim.
 
-Provider audit: PR remains OPEN/draft, MERGEABLE/CLEAN; no reported checks,
-required branch checks, rulesets or provider approval. No CI failure/conflict
-exists to repair; no extra gate introduced. Repository moved to iglo.memory;
-canonical PR and workflow tracker updated. No merge requested or performed.
-No release/follow-up hooks configured; no release published. Retain the branch,
-worktree and local binary for the pending live QA. No remote messages sent.
+Hosted checks: push33964026774 and PR33964028645 SUCCESS at reviewed head; tests/types/build/PTY/clean/container/package/upload all pass. Downloaded artifact9968846191 archive digest matches GitHub; executable0755, all5 commands pass in clean Debian without runtimes/Git/network/separate addon. downloaded-artifact.json records digest and cleanup. PR artifacts expire after14 days; rebuilding refreshes them.
 
-Exact next action: user configures an OpenRouter key locally with this worktree's
-dist/iglo.mem init, then reports configured. Availability check found neither
-environment nor saved credential; no value was exposed. Run one small disposable
-fixture document batch and two real search queries, verify semantic paraphrase/
-exact-term behavior, response integrity, saved-key reuse and resulting snapshot.
-No key should be pasted into chat. Audit remaining coverage after live proof;
-retain other candidate-platform gaps explicitly (only Linux x86_64 verified).
-Reverify/review if live evidence requires code changes, then finish at readiness.
+Reviews: standard/gilfoyle/ponytail all terminal PASS after verification. Prior containment, credential race and CI fixture-ownership issues repaired; all historical findings and lane disagreements retained. No additional review/domain-expert gate configured. No unresolved finding or product acceptance gap.
 
-Read-only retro lessons saved in retro.md; its COMPLETE is only report status.
-No production source changed after the reviewed implementation revision.
+Provider: existing PR only; mergeable, no conflicts, labels or required approval; main protection disabled and rulesets empty. Real CI is not bypassed. Final delivery metadata does not change production/build/test code; finish rechecks checks after its push before reporting completion. No merge requested or performed. Mark existing PR ready after final push checks.
+
+Follow-ups: no configured release/follow-up hooks. No tagged release, extra PR, issue or message to others. Preserve active worktree/branch/local binary and user-owned .agent plus saved credentials. Disposable homes/repos/download/container cleaned. Saved read-only retro lessons are separate from this delivery Status. Optional future ports require their own build/runtime proof.
+
+Open scope items: none. Operational finalization: push evidence metadata and confirm actual head checks, then ready the PR; final handoff records that completed state.

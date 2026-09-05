@@ -140,5 +140,5 @@ Do not use bare `bun src/cli.ts` from an untrusted repository.
 
 Tests use disposable repositories, homes and dummy credentials. API contract
 and ranking fixtures are deterministic mocks; they do not establish live-provider
-relevance. See `.ai/work/iglo-mem/evidence/` for measured verification and remaining
-release/platform/quality work.
+relevance. See `.ai/work/iglo-mem/evidence/` for live-provider, downloaded-build, concurrency and measured performance proof.
+Other platforms require separate verification before being advertised.
