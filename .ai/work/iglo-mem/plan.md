@@ -83,3 +83,5 @@ Measure the actual compiled binary, 10,000 active chunks, 1,536 and 3,072 dimens
 Step 5 frontier: D03 selected custom embedded Node-API directory-lock experiment; independent T01 argument/resolver/config modules in progress. T01 completion remains gated by D03.
 
 Step 5 result: independent T01 argument/config/resolver modules pass 10 tests and strict types (evidence/T01/verify.md). D03 probe failed G05 relocation containment; immediate revalidation also failed (evidence/D03/probe.md). T01 credential work and dependent tasks remain blocked. D01 and D03 user decisions pending; D02/D04/D05 unchanged. No task T01–T10 or full requirement is verified.
+
+Checkpoint: implementation da10482 passes all three independent round-2 reviews (evidence/T01/review-round2.md); 12 tests/79 assertions and strict types pass. Draft PR #1: https://github.com/iglo-tech/iglo.mem/pull/1. This is partial module acceptance only; no T01–T10 task/PRD row is complete. Next action awaits D01/D03 decisions; resume.md pins the exact frontier.
