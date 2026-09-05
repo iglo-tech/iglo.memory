@@ -1,8 +1,6 @@
 # Retrieval v2: first ready slices and evaluation protocol
 
-Status: specified for future implementation. No corpus, runner or quality report
-is claimed delivered by this planning artifact. Parent contract:
-[retrieval-v2.md](retrieval-v2.md). Task IDs are stable across sessions.
+Status: implementation pending. Parent contract: [retrieval-v2.md](retrieval-v2.md).
 
 ## goal
 
@@ -13,8 +11,7 @@ so passage construction and full retrieval can be specified against known limits
 ## non_goals
 
 No production retrieval changes in these slices, new product search flags, QMD
-runtime dependency, synthetic-vector relevance claims, automatic model selection,
-or substitution of Gemini/GPT-4.1 for the owner's requested GPT-5.6 Luna.
+runtime dependency, synthetic-vector relevance claims or automatic model selection.
 
 ## decisions
 
@@ -160,7 +157,7 @@ compare QMD repeated-cache timing with novel-query iglo.mem as one unlabeled sco
 
 ### T02 — Exact provider contract and measurement
 
-Owner-selected default: `openai/gpt-5.6-luna`, `reasoning: { effort: "low" }`,
+Default: `openai/gpt-5.6-luna`, `reasoning: { effort: "low" }`,
 for both expansion and reranking. No older-model experiment. [Official model docs](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
 confirm low reasoning. The [OpenRouter catalog](https://openrouter.ai/api/v1/models)
 and [Luna endpoints](https://openrouter.ai/api/v1/models/openai/gpt-5.6-luna/endpoints)
@@ -173,15 +170,12 @@ strict schemas and required-parameter routing from the parent spec. Omit tempera
 it is not listed for this route. Do not fall back to medium/default reasoning.
 Reserve output budget for both reasoning and visible JSON. Start probe caps at
 2,048 total completion tokens per stage; measure length/refusal failures before
-freezing a cap. The exact two schemas and prompts in D04/D06 are the test inputs,
-not the earlier research prompts. Record request parameters and hashes.
+freezing a cap. Use the exact schemas and prompts in D04/D06. Record request parameters and hashes.
 
 Observed standard catalog pricing is $0.20/M input and $1.20/M output; route prices
 vary. At those rates, 20,000 input plus 2,048 output tokens costs about $0.00646
 for reranking alone. This is arithmetic, not measured Luna usage; expansion,
-query embeddings and retries add cost. Earlier 24-call Gemini/GPT-mini observations
-are historical and cannot support Luna latency/cost targets. No inference calls
-were made in the specification step.
+query embeddings and retries add cost. Measure Luna latency and usage in T02.
 
 Use the development corpus to form 8/24/40 complete-candidate payloads across
 300/500/700-token passage sweeps, with heading/path context included. Use at least
@@ -191,7 +185,7 @@ negative evidence, absent answers and injected instructions. Record candidate
 position variants separately. Sweep only the selected Luna-low model. Freeze a
 spending estimate from the serialized payloads before executing the harness;
 stop and report if its declared ceiling is reached, without silently reducing
-question coverage. Paid probes are future T02 work, not this planning task.
+question coverage.
 
 Publish exact tokenizer package/version/license and bundled artifact hashes,
 verified model mapping, wrapper/context shortening format, per-input and aggregate
@@ -243,7 +237,6 @@ separate tracker tasks. Later stable tasks remain in the parent specification.
 T01: public Git sources/licenses, reviewer, pinned baseline build and a QMD-capable
 evaluation host. T02: selected-model route/account access and T01 development data.
 Research can resolve provider/tokenizer questions without altering product code.
-No required owner decision blocks these tasks now.
 
 ## open_questions
 
@@ -273,4 +266,4 @@ For T02, reproduce exact serialized prompts/schemas, validate malformed-response
 fixtures locally, then run the declared Luna-low matrix. Inspect usage, reasoning
 budget, candidate completeness and suffix/identifier handling. Publish the durable
 capacity/reproduction decision in docs; keep raw responses and timings in run
-storage. T01/T02 verification requires actual evidence; this document is the plan.
+storage. Verify T01/T02 against the recorded evidence.

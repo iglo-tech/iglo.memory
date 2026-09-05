@@ -1,8 +1,7 @@
 # Retrieval v2 specification
 
-Status: planning complete; implementation pending. Later measurement decisions are
-explicit gates, not resolved performance or quality claims. The ready contracts
-are RV2-T01 and RV2-T02 in [the first-slice specification](retrieval-v2-foundation.md).
+Status: implementation pending. Start with RV2-T01 and RV2-T02 in
+[the foundation specification](retrieval-v2-foundation.md).
 
 ## goal
 
@@ -11,25 +10,16 @@ baseline `9670f625661e46935ec1523bb70c6dd8b35d48e4`, while retaining one standal
 repository-local CLI. Compare against QMD's full retrieval mode before making
 any claim about relative quality.
 
-Authority: the user's next-version request, captured by the
-[brief](../retrieval-v2-brief.md), then this specification and the
-[design boundary](../retrieval-v2-design.md). [PRD.md](../../PRD.md),
-[README](../../README.md), [decisions](../decisions.md) and
-[verification](../verification.md) describe the delivered baseline. This document
-proposes changes; it does not claim they are implemented.
-
 ## non_goals
 
 No generated answers, local inference, database service, daemon, new source roots,
 background preparation, freshness checks, persistent search cache, cross-worktree
 index sharing, additional credential service, pipeline flags, or new platform
-support. QMD is an evaluation dependency only. No production code or tracker tasks
-are part of this planning run.
+support. QMD is an evaluation dependency only.
 
 ## Requirements
 
-These IDs cover the new request and retained PRD contracts. Task/evidence coverage
-is in the untracked plan; the task definitions below remain durable.
+Stable requirement IDs link implementation tasks to acceptance evidence.
 
 | ID  | Contract and source                                                                                                                       |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -166,8 +156,8 @@ path-leading punctuation) in every expansion. Empty backtick spans are ignored;
 ordinary words are not forced into every paraphrase. The lexical tokenizer and
 literal detector have distinct purposes and tests.
 
-User-selected model for both chat stages: `openai/gpt-5.6-luna`, with
-`reasoning: { effort: "low" }`. No older-model challenger. Retain
+Model for both chat stages: `openai/gpt-5.6-luna`, with
+`reasoning: { effort: "low" }`. Retain
 `openai/text-embedding-3-small` for embeddings. Optional
 `retrieval.model` is the only added configuration; absence selects the default.
 Changing it alone does not require prepare. No automatic cross-model fallback.
@@ -372,8 +362,7 @@ Existing Bun/TypeScript build and lock binding; OpenRouter credentials for live
 experiments; public corpus licenses; an independent human label reviewer; QMD
 runtime/model downloads in evaluation storage; Linux host with recorded hardware.
 No additional product provider is justified. A missing QMD environment blocks
-completion of the comparative task, not offline fixture work. No required user
-choice or unresolved merge prerequisite blocks starting T01.
+completion of the comparative task, not offline fixture work.
 
 ## open_questions
 
@@ -386,9 +375,7 @@ choice or unresolved merge prerequisite blocks starting T01.
 | G05  | Does inline lexical data keep local complete search overhead <1 s at 10,000 passages? T03/T07 implementer     | Measure both 1,536/3,072 dimensions. If failed, profile before choosing immutable sidecars; preserve one publication point.                                                                                                       |
 | G06  | Does the held-out gain justify release and how far is it from QMD? T06 evaluator                              | Failed or inconclusive gates block the quality claim/default rollout; retain baseline and record the outcome.                                                                                                                     |
 
-These are required downstream gates with owners, not decisions declared complete.
-The planning deliverable is complete when all requirements have tasks and checks;
-implementation and quality remain unverified.
+Close each gate with evidence before starting its dependent task.
 
 ## qa_procedure
 
@@ -405,4 +392,4 @@ checks; nondeterministic models do not promise byte-identical answers.
 
 Follow [the evaluation procedure](retrieval-v2-foundation.md) for quality proof.
 Keep raw timings/outputs in Cezar storage. Promote only durable methodology and
-release decisions into docs. This planning run does not execute that QA.
+release decisions into docs.
