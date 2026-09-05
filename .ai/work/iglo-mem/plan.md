@@ -35,4 +35,4 @@ Every task uses the final cumulative [product verification](evidence/resumed/ver
 
 Historical design/provisional contracts: [design](../../briefs/iglo-mem-design.md), [research](../../research/prd-feasibility.md), [original slice spec](../../specs/iglo-mem-next.md). Where they conflict, accepted amendments and verified final contract govern. Historical failed feasibility probes are preserved, not treated as current work after the user's clarification.
 
-Next: final pushed-head checks, mark existing PR #1 ready. No merge/cleanup of this active worktree or user-owned .agent is authorized or needed. No configured release/follow-up hooks. Future ports require their own proof before support claims.
+Delivery: existing PR #1 is ready for review after metadata-head checks passed. No merge/cleanup of this active worktree or user-owned .agent is authorized or needed. No configured release/follow-up hooks. Future ports require their own proof before support claims.

@@ -14,5 +14,5 @@
     "macOS x86_64/arm64",
     "Windows x86_64"
   ],
-  "next": "Final metadata push/checks and mark PR ready; do not merge."
+  "next": "None for readiness delivery; PR #1 is ready, not merged."
 }
