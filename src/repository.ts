@@ -1,6 +1,15 @@
-import { constants, closeSync, fstatSync, lstatSync, openSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import {
+  constants,
+  closeSync,
+  fstatSync,
+  lstatSync,
+  openSync,
+  readFileSync,
+  realpathSync,
+  statSync,
+} from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { AppError } from './errors';
+import { AppError } from '@/src/errors';
 
 function isMissing(error: unknown): boolean {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
@@ -26,9 +35,16 @@ function validHead(head: string): boolean {
   if (!head.startsWith('ref: refs/')) return false;
   const ref = head.slice(5);
   // Git check-ref-format rules; no Git subprocess is needed at runtime.
-  return !/[\x00-\x20\x7f~^:?*\[\\]/.test(ref)
-    && !ref.includes('..') && !ref.includes('@{') && !ref.endsWith('.')
-    && ref.split('/').every(part => part.length > 0 && !part.startsWith('.') && !part.endsWith('.lock'));
+  return (
+    // oxlint-disable-next-line no-control-regex -- Git refnames must reject control bytes.
+    !/[\x00-\x20\x7f~^:?*[\\]/.test(ref) &&
+    !ref.includes('..') &&
+    !ref.includes('@{') &&
+    !ref.endsWith('.') &&
+    ref
+      .split('/')
+      .every((part) => part.length > 0 && !part.startsWith('.') && !part.endsWith('.lock'))
+  );
 }
 
 function validateAdmin(path: string, linked: boolean): void {
@@ -41,6 +57,7 @@ function validateAdmin(path: string, linked: boolean): void {
   if (linked) {
     try {
       const value = readRegularFile(join(path, 'commondir')).trim();
+      // oxlint-disable-next-line no-control-regex -- Administrative paths reject NUL and line breaks.
       if (!value || /[\r\n\x00]/.test(value)) throw new Error('invalid commondir');
       common = realpathSync(resolve(path, value));
     } catch (error) {
@@ -69,6 +86,7 @@ export function resolveWorktree(cwd: string): string {
         if (entry.isDirectory()) validateAdmin(marker, false);
         else if (entry.isFile()) {
           const text = readRegularFile(marker);
+          // oxlint-disable-next-line no-control-regex -- A gitfile path cannot contain a NUL byte.
           const match = /^gitdir: ([^\r\n\x00]+)\r?\n?$/.exec(text);
           if (!match?.[1]?.trim()) throw new Error('invalid gitfile');
           const target = match[1].trim();
@@ -78,9 +96,12 @@ export function resolveWorktree(cwd: string): string {
       }
       // Do not mistake a bare repository nested in a worktree for that worktree.
       try {
-        if (lstatSync(join(current, 'HEAD')).isFile()
-          && validHead(readRegularFile(join(current, 'HEAD')).trim())
-          && directory(join(current, 'objects')) && directory(join(current, 'refs'))) {
+        if (
+          lstatSync(join(current, 'HEAD')).isFile() &&
+          validHead(readRegularFile(join(current, 'HEAD')).trim()) &&
+          directory(join(current, 'objects')) &&
+          directory(join(current, 'refs'))
+        ) {
           throw new AppError('REPOSITORY_INVALID');
         }
       } catch (error) {

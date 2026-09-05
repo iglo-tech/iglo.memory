@@ -2,14 +2,19 @@
   "name": "iglo.mem",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.4.2",
   "scripts": {
+    "lint": "oxlint --deny-warnings src test scripts",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
     "test": "sh scripts/check.sh",
     "build": "sh scripts/build.sh",
     "qa": "sh scripts/build.sh && python3 scripts/qa-terminal.py"
   },
   "devDependencies": {
     "@types/bun": "1.4.1",
+    "oxfmt": "0.66.0",
+    "oxlint": "1.81.0",
     "typescript": "7.0.2"
-  }
+  },
+  "packageManager": "bun@1.4.2"
 }

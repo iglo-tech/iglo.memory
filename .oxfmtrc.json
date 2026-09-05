@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "printWidth": 100,
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    ".agents/**",
+    ".ai/**",
+    ".agent/**",
+    "PRD.md",
+    "bun.lock"
+  ]
+}

@@ -17,12 +17,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes libnode-dev
           npx --yes bun@1.4.2 install --frozen-lockfile
-      - name: Test and typecheck
+      - name: Lint, format, test and typecheck
         run: sh scripts/check.sh
       - name: Build standalone executable
         run: sh scripts/build.sh
-      - name: Verify terminal and clean-machine behavior
+      - name: Verify CLI, terminal and clean-machine behavior
         run: |
+          npx --yes bun@1.4.2 --no-env-file --no-install --config=/dev/null scripts/qa-cli.ts
           python3 scripts/qa-terminal.py
           python3 scripts/qa-clean.py
       - name: Package executable with its permissions

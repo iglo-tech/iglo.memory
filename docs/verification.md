@@ -14,6 +14,20 @@ npx --yes bun@1.4.2 --no-env-file --no-install --config=/dev/null scripts/qa-cli
 ```
 
 `check.sh` builds the native binding, runs the tests and checks TypeScript.
+It also enforces oxlint and oxfmt. For faster feedback while editing:
+
+```sh
+bun run lint
+bun run format:check
+bun run format
+```
+
+The last command writes formatting changes. Dependencies are pinned in
+`package.json` and `bun.lock`; CI uses the same checks. Typechecking includes
+source, tests and TypeScript scripts. Root imports use `@/` through
+`tsconfig.json`; lint rejects relative imports, re-exports and literal dynamic
+imports. A regression test exercises those failures through the real linter.
+
 The tests cover credentials, parsing, API response validation/failures,
 incremental publication, ranking, data integrity and concurrent worktrees.
 The terminal harness checks hidden input, cancellation, reset and shared-key

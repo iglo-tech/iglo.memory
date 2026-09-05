@@ -1,7 +1,7 @@
 import { lstatSync } from 'node:fs';
 import { join } from 'node:path';
-import { AppError } from './errors';
-import { readRegularFile } from './repository';
+import { AppError } from '@/src/errors';
+import { readRegularFile } from '@/src/repository';
 
 export const DEFAULT_MODEL = 'openai/text-embedding-3-small';
 export type Config = { project: string; embedding: { model: string } };
@@ -11,11 +11,17 @@ function record(value: unknown): value is Record<string, unknown> {
 }
 
 function validText(value: unknown): value is string {
+  // oxlint-disable-next-line no-control-regex -- Reject NUL and line breaks in configuration fields.
   return typeof value === 'string' && value.trim().length > 0 && !/[\r\n\x00]/.test(value);
 }
 
 export function validateConfig(value: unknown): Config {
-  if (!record(value) || !validText(value.project) || !record(value.embedding) || !validText(value.embedding.model)) {
+  if (
+    !record(value) ||
+    !validText(value.project) ||
+    !record(value.embedding) ||
+    !validText(value.embedding.model)
+  ) {
     throw new AppError('CONFIG_INVALID');
   }
   // Return only supported settings. Reading never rewrites the user-owned bytes.

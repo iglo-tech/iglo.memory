@@ -76,3 +76,18 @@ binding and requires the target OS C runtime, but no separately installed
 Bun, Node, npm or Git. Other OS/CPU ports need their own native-lock, terminal
 and clean-machine proof before support is advertised. Builds and the supported
 source launcher disable repository dotenv and Bun configuration/preload loading.
+
+## Bun APIs and imports
+
+Use Bun's native APIs for hashing, ordinary script file I/O and subprocesses;
+use global crypto for UUID generation. Keep the OS filesystem operations needed
+for permissions, directories, exclusive creation, validated synchronous reads
+and atomic rename. Removing those operations just to eliminate `node:` imports
+would change the file-safety and publication guarantees. Path and OS utilities
+also use Bun's supported `node:path` and `node:os` implementations.
+
+All project module imports use `@/` mapped to the repository root. Oxlint checks
+the rule and oxfmt keeps layout consistent. Builtins and packages retain their
+normal names. The sole `require` exception is `@/dist/lock.node`, because Bun
+requires `require()` to load Node-API addons; the alias remains statically
+resolvable and the compiled executable embeds the addon.
