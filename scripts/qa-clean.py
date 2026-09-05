@@ -1,5 +1,5 @@
 """Run the executable in a disposable Debian container without language runtimes."""
-import json, pathlib, subprocess, tempfile, sys
+import os, json, pathlib, subprocess, tempfile, sys
 binary=pathlib.Path(sys.argv[1] if len(sys.argv)>1 else 'dist/iglo.mem').resolve()
 image='debian@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171'
 with tempfile.TemporaryDirectory(prefix='iglo-clean-',dir='/tmp') as temp:
@@ -16,8 +16,8 @@ unset OPENROUTER_API_KEY
 /iglo.mem status
 /iglo.mem gc
 '''
-    result=subprocess.run(['docker','run','--rm','--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user','1000:1000','--tmpfs','/tmp:rw,exec,mode=1777','--mount',f'type=bind,src={binary},dst=/iglo.mem,readonly','--mount',f'type=bind,src={root},dst=/repo','--workdir','/repo',image,'sh','-c',script],capture_output=True,text=True,timeout=45)
-    if result.returncode: raise RuntimeError(result.stderr)
+    result=subprocess.run(['docker','run','--rm','--network=none','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges','--user',f'{os.getuid()}:{os.getgid()}','--tmpfs','/tmp:rw,exec,mode=1777','--mount',f'type=bind,src={binary},dst=/iglo.mem,readonly','--mount',f'type=bind,src={root},dst=/repo','--workdir','/repo',image,'sh','-c',script],capture_output=True,text=True,timeout=45)
+    if result.returncode: raise RuntimeError(result.stdout + result.stderr)
     results=[json.loads(line) for line in result.stdout.splitlines()]
     assert len(results)==5 and results[0]['credentialSource']=='environment' and results[2]['results']==[]
     assert not any(b'dummy-fixture-key' in path.read_bytes() for path in root.rglob('*') if path.is_file())
