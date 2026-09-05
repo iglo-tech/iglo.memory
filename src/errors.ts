@@ -34,7 +34,13 @@ const messages = {
 export type ErrorCode = keyof typeof messages;
 
 export class AppError extends Error {
-  constructor(readonly code: ErrorCode) {
+  constructor(
+    readonly code: ErrorCode,
+    readonly details?: {
+      stage: 'embedding' | 'rerank';
+      reason: 'transport' | 'rate_limit' | 'provider' | 'invalid_response' | 'budget';
+    },
+  ) {
     super(messages[code]);
     this.name = 'AppError';
   }
@@ -43,5 +49,11 @@ export class AppError extends Error {
 // Never serialize an arbitrary exception: it may contain paths, input or secrets.
 export function errorResponse(error: unknown) {
   const code = error instanceof AppError ? error.code : 'INTERNAL_ERROR';
-  return { error: { code, message: messages[code] } };
+  return {
+    error: {
+      code,
+      message: messages[code],
+      ...(error instanceof AppError ? error.details : undefined),
+    },
+  };
 }

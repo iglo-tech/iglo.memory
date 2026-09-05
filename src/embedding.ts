@@ -1,5 +1,6 @@
 import { AppError } from '@/src/errors';
 import { record } from '@/src/files';
+import { requestSearchJson } from '@/src/search-transport';
 export const BASE_URL = 'https://openrouter.ai/api/v1';
 export function validVector(value: unknown, dimensions?: number): number[] {
   if (
@@ -32,7 +33,30 @@ export async function embed(
   dimensions?: number,
   request: typeof fetch = fetch,
   sleep: (ms: number) => Promise<unknown> = (ms) => Bun.sleep(ms),
+  options?: { deadline: number },
 ): Promise<number[][]> {
+  if (options) {
+    const body = await requestSearchJson(
+      `${BASE_URL}/embeddings`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, input: inputs, encoding_format: 'float' }),
+      },
+      { ...options, maxBytes: 512 * 1024, code: 'EMBEDDING_FAILED' },
+      request,
+      sleep,
+    );
+    try {
+      const vectors = parseEmbeddings(body, inputs.length, dimensions);
+      if (performance.now() >= options.deadline) throw new AppError('SEARCH_TIMEOUT');
+      return vectors;
+    } catch (error) {
+      if (performance.now() >= options.deadline) throw new AppError('SEARCH_TIMEOUT');
+      if (error instanceof AppError && error.code === 'SEARCH_TIMEOUT') throw error;
+      throw new AppError('EMBEDDING_FAILED', { stage: 'embedding', reason: 'invalid_response' });
+    }
+  }
   const deadline = performance.now() + 120_000;
   for (let attempt = 0; attempt < 4; attempt++) {
     let response: Response;
@@ -73,28 +97,32 @@ export async function embed(
       retry = true;
     }
     if (!retry) {
-      if (!record(body) || !Array.isArray(body.data) || body.data.length !== inputs.length)
-        throw new AppError('EMBEDDING_FAILED');
-      // oxlint-disable-next-line unicorn/no-new-array -- Populate slots by validated response index.
-      const vectors: number[][] = new Array(inputs.length);
-      let expected = dimensions;
-      for (const item of body.data as unknown[]) {
-        if (
-          !record(item) ||
-          !Number.isInteger(item.index) ||
-          (item.index as number) < 0 ||
-          (item.index as number) >= inputs.length ||
-          vectors[item.index as number]
-        )
-          throw new AppError('EMBEDDING_FAILED');
-        const vector = validVector(item.embedding, expected);
-        expected ??= vector.length;
-        vectors[item.index as number] = vector;
-      }
-      return vectors;
+      return parseEmbeddings(body, inputs.length, dimensions);
     }
     if (attempt === 3 || delay >= deadline - performance.now()) break;
     await sleep(delay);
   }
   throw new AppError('EMBEDDING_FAILED');
+}
+
+function parseEmbeddings(body: unknown, count: number, dimensions?: number): number[][] {
+  if (!record(body) || !Array.isArray(body.data) || body.data.length !== count)
+    throw new AppError('EMBEDDING_FAILED');
+  // oxlint-disable-next-line unicorn/no-new-array -- Populate slots by validated response index.
+  const vectors: number[][] = new Array(count);
+  let expected = dimensions;
+  for (const item of body.data as unknown[]) {
+    if (
+      !record(item) ||
+      !Number.isInteger(item.index) ||
+      (item.index as number) < 0 ||
+      (item.index as number) >= count ||
+      vectors[item.index as number]
+    )
+      throw new AppError('EMBEDDING_FAILED');
+    const vector = validVector(item.embedding, expected);
+    expected ??= vector.length;
+    vectors[item.index as number] = vector;
+  }
+  return vectors;
 }

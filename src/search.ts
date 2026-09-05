@@ -1,3 +1,4 @@
+import { AppError } from '@/src/errors';
 import type { Config } from '@/src/config';
 import { embed } from '@/src/embedding';
 import { budgetFor } from '@/src/token-budget';
@@ -44,8 +45,53 @@ export function originalCandidates(
     .slice(0, 40);
   return { vector, lexical };
 }
-// Intermediate original-query ranking. T04/T05 add protected candidate selection
-// and dedicated reranking before the release gate can be evaluated.
+type Candidate = { chunk: StoredChunk; score: number };
+export function fuseCandidates(lists: { vector: Candidate[]; lexical: Candidate[] }): Candidate[] {
+  const scores = new Map<string, Candidate>();
+  const protectedIds = new Set<string>();
+  const key = (chunk: StoredChunk) => JSON.stringify([chunk.source, chunk.start, chunk.end]);
+  for (const list of [lists.vector, lists.lexical]) {
+    const seen = new Set<string>();
+    let rank = 0;
+    for (const { chunk } of list) {
+      const id = key(chunk);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      rank++;
+      if (rank > 40) break;
+      if (rank <= 8) protectedIds.add(id);
+      const current = scores.get(id) ?? { chunk, score: 0 };
+      current.score += 1 / (60 + rank);
+      scores.set(id, current);
+    }
+  }
+  const ordered = [...scores.values()].sort(
+    (a, b) => b.score - a.score || comparePassages(a.chunk, b.chunk),
+  );
+  const selected = new Set(protectedIds);
+  const perFile = new Map<string, number>();
+  const add = (item: Candidate) => {
+    selected.add(key(item.chunk));
+    perFile.set(item.chunk.source, (perFile.get(item.chunk.source) ?? 0) + 1);
+  };
+  for (const item of ordered) if (protectedIds.has(key(item.chunk))) add(item);
+  const deferred: Candidate[] = [];
+  for (const item of ordered) {
+    if (selected.has(key(item.chunk))) continue;
+    if (selected.size >= 40) break;
+    if ((perFile.get(item.chunk.source) ?? 0) < 2) add(item);
+    else deferred.push(item);
+  }
+  for (const item of deferred) {
+    if (selected.size >= 40) break;
+    add(item);
+  }
+  return ordered.filter((item) => selected.has(key(item.chunk)));
+}
+export function checkSearchDeadline(deadline: number) {
+  if (performance.now() >= deadline) throw new AppError('SEARCH_TIMEOUT');
+}
+// Intermediate presentation; T05 reranks the complete protected candidate set.
 export function rank(
   snapshot: Snapshot,
   vectors: ReadonlyMap<string, ArrayLike<number>>,
@@ -54,15 +100,7 @@ export function rank(
   vectorNorms?: ReadonlyMap<string, number>,
 ) {
   const lists = originalCandidates(snapshot, vectors, query, queryVector, vectorNorms);
-  const scores = new Map<string, { chunk: StoredChunk; score: number }>();
-  for (const list of [lists.vector, lists.lexical])
-    list.forEach(({ chunk }, index) => {
-      const current = scores.get(chunk.passageId) ?? { chunk, score: 0 };
-      current.score += 1 / (60 + index + 1);
-      scores.set(chunk.passageId, current);
-    });
-  return [...scores.values()]
-    .sort((a, b) => b.score - a.score || comparePassages(a.chunk, b.chunk))
+  return fuseCandidates(lists)
     .slice(0, 8)
     .map(({ chunk }, index) => ({
       score: Math.round((1 / (index + 1)) * 1e6) / 1e6,
@@ -82,38 +120,64 @@ export async function search(
   query: string,
   embedding = embed,
   credential = requireCredential,
+  options: { deadline?: number } = {},
 ) {
-  const loaded = await withIndexLock(root, () => {
-    const snapshot = readSnapshot(root, config);
-    return { snapshot, ...loadVectors(root, snapshot) };
-  });
-  const { snapshot, vectors, norms } = loaded;
-  if (!snapshot.chunks.length)
+  const deadline = options.deadline ?? performance.now() + 30_000;
+  try {
+    checkSearchDeadline(deadline);
+    const loaded = await withIndexLock(
+      root,
+      () => {
+        checkSearchDeadline(deadline);
+        const snapshot = readSnapshot(root, config);
+        checkSearchDeadline(deadline);
+        const loaded = { snapshot, ...loadVectors(root, snapshot) };
+        checkSearchDeadline(deadline);
+        return loaded;
+      },
+      Math.min(5000, deadline - performance.now()),
+    );
+    checkSearchDeadline(deadline);
+    const { snapshot, vectors, norms } = loaded;
+    if (!snapshot.chunks.length)
+      return {
+        query,
+        preparedAt: snapshot.preparedAt,
+        responseVersion: 2,
+        scoreKind: 'ordinal',
+        retrievalRevision: 'original-hybrid-v2',
+        results: [],
+      };
+    const budget = budgetFor(config.embedding.model);
+    const input = budget.formatQuery(query);
+    budget.batches([input]);
+    checkSearchDeadline(deadline);
+    const key = credential();
+    checkSearchDeadline(deadline);
+    const [queryVector] = await embedding(
+      [input],
+      config.embedding.model,
+      key,
+      snapshot.profile.dimensions!,
+      undefined,
+      undefined,
+      { deadline },
+    );
+    checkSearchDeadline(deadline);
+    const results = rank(snapshot, vectors, query, queryVector!, norms);
+    checkSearchDeadline(deadline);
     return {
       query,
-      preparedAt: snapshot.preparedAt,
       responseVersion: 2,
       scoreKind: 'ordinal',
       retrievalRevision: 'original-hybrid-v2',
-      results: [],
+      preparedAt: snapshot.preparedAt,
+      results,
     };
-  const budget = budgetFor(config.embedding.model);
-  const input = budget.formatQuery(query);
-  budget.batches([input]);
-  const [queryVector] = await embedding(
-    [input],
-    config.embedding.model,
-    credential(),
-    snapshot.profile.dimensions!,
-  );
-  return {
-    query,
-    responseVersion: 2,
-    scoreKind: 'ordinal',
-    retrievalRevision: 'original-hybrid-v2',
-    preparedAt: snapshot.preparedAt,
-    results: rank(snapshot, vectors, query, queryVector!, norms),
-  };
+  } catch (error) {
+    checkSearchDeadline(deadline);
+    throw error;
+  }
 }
 export async function status(root: string, config: Config) {
   return withIndexLock(root, () => {

@@ -73,6 +73,10 @@ try {
   if (sha256(await Bun.file(file).bytes()) !== sourceHash) throw new Error('source mutation');
   const snapshot = join(root, '.agent/memory-index/snapshot.json');
   const prior = sha256(await Bun.file(snapshot).bytes());
+  const failure = await run(['search', 'FAIL_PROVIDER token'], false);
+  if (failure.error?.code !== 'EMBEDDING_FAILED' || failure.results !== undefined)
+    throw new Error('search failure contract');
+  if (sha256(await Bun.file(snapshot).bytes()) !== prior) throw new Error('search mutation');
   await Bun.write(file, '# Authentication\nFAIL_PROVIDER token');
   await run(['prepare'], false);
   if (sha256(await Bun.file(snapshot).bytes()) !== prior) throw new Error('failed publication');
@@ -97,6 +101,7 @@ try {
         .trim()
         .split('\n')
         .map((line) => JSON.parse(line)),
+      searchFailureNoPartialResults: 'PASS',
       sourcePreservation: 'PASS',
       failedRefreshPreservation: 'PASS',
       sourceIndependentSearch: 'PASS',

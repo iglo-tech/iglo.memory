@@ -148,3 +148,30 @@ test('filesystem preparation preserves a UTF-8 BOM in source coverage and coordi
     expect(Array.from(normalized).slice(chunk.start, chunk.end).join('')).toBe(chunk.text);
   }
 });
+
+test('search deadline stops before loading and takes precedence after local stage failure', async () => {
+  const root = setup();
+  await prepare(root, config, embed, key);
+  await expect(
+    search(root, config, 'q', noNetwork, noNetwork, { deadline: performance.now() - 1 }),
+  ).rejects.toThrow('total deadline');
+  expect((await search(root, config, 'q', noNetwork, noNetwork)).results).toEqual([]);
+  await Bun.write(join(root, '.agent/knowledge/a.md'), '# Title\nbody');
+  await prepare(root, config, embed, key);
+  const deadline = performance.now() + 25;
+  await expect(
+    search(
+      root,
+      config,
+      'q',
+      embed,
+      () => {
+        while (performance.now() < deadline) {
+          /* simulate synchronous credential work */
+        }
+        throw new Error('secret');
+      },
+      { deadline },
+    ),
+  ).rejects.toThrow('total deadline');
+});
