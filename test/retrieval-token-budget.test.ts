@@ -4,7 +4,25 @@ import {
   serializedChatTokens,
   boundedContext,
   splitWrapped,
+  chatRequestBudget,
 } from '@/scripts/retrieval-eval/token-budget';
+
+test('serialized chat budget accepts its exact boundary without modifying the request', () => {
+  const request = { question: ' a'.repeat(65532) };
+  const original = JSON.stringify(request);
+  const tokens = serializedChatTokens(request);
+  request.question += ' a'.repeat(65536 - tokens);
+  expect(chatRequestBudget(request)).toEqual({
+    serializedTokens: 65536,
+    inputReservation: 73728,
+    outputReservation: 2048,
+  });
+  expect(request.question.startsWith(JSON.parse(original).question)).toBe(true);
+  const frozen = JSON.stringify(request);
+  chatRequestBudget(request);
+  expect(JSON.stringify(request)).toBe(frozen);
+  expect(() => chatRequestBudget({ question: request.question + ' a' })).toThrow('exceeds');
+});
 
 test('exact embedding counts include Unicode and literal tokenizer control strings', () => {
   expect(embeddingTokens('hello world')).toBe(2);

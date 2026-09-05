@@ -24,6 +24,11 @@ export function serializedChatTokens(value: unknown): number {
   chat ??= new Tiktoken(o200k);
   return chat.encode(text, [], []).length;
 }
+export function chatRequestBudget(value: unknown) {
+  const serializedTokens = serializedChatTokens(value);
+  check(serializedTokens <= 65536, 'Serialized chat request exceeds token budget');
+  return { serializedTokens, inputReservation: serializedTokens + 8192, outputReservation: 2048 };
+}
 export function boundedContext(project: string, path: string, headings: string[], limit = 256) {
   check(Number.isSafeInteger(limit) && limit > 0, 'Invalid context budget');
   const full = [project, path, ...headings];
