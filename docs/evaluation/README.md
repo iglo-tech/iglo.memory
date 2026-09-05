@@ -115,11 +115,16 @@ an exclusive `.claim`: confirm the original process has stopped, preserve the cl
 as evidence, then remove it to resume. Explicit reruns use a new config attempt ID.
 No observation is silently overwritten or retried to improve a score.
 
-This checkpoint supports new CLI processes only. It does not mislabel OS/provider
-cache state as model-cold or merge it with a warm-process regime. Whole-process
-elapsed time is measured; unavailable stages, retries and usage remain null with
-reasons. A complete timing benchmark requires at least three repetitions per query
-in each specified regime after label and smoke gates pass.
+The native `cli.ts run` harness measures new CLI processes. It does not infer
+model or provider cache state from process lifetime. Whole-process elapsed time is
+measured; unavailable stages, retries and usage remain null with reasons.
+Separate finite QMD adapter experiments exercise warm models and persistent caches
+through the same pinned stock retrieval functions. Their API timing excludes
+startup and priming and must never be merged with whole-CLI timings. The development
+runs provide three repetitions per question; the separate project pilots diagnose
+cache regimes without claiming all-question, whole-CLI latency in every regime.
+See the completed [cache-regime diagnostic](cache-regimes.md) for measurements,
+reproduction boundaries and artifact identities.
 
 ## Scoring and limitations
 
@@ -164,9 +169,14 @@ matching cache descriptions, then recalculates scores from raw observations.
 Missing units remain explicit; changed or corrupt records are never repaired.
 Joined artifacts include raw-record hashes and publish without overwriting prior
 reports. Matching descriptions still require inspection of actual cache/stage
-evidence. Blinded adjudication imports, candidate recall and all cache regimes
-remain T01 work. Preparation-edit experiments require separate retained evidence.
-No report from this checkpoint can pass F06 or a release gate.
+evidence. Blinded adjudication imports and returned-window reconstruction are
+implemented and exercised; see the [development checkpoint](development-checkpoint.md).
+That diagnostic keeps complete prepared chunks and QMD selected windows separate
+from displayed excerpts and discloses model-input truncation limits. It does not
+measure recall of the top-40 candidate pool; that diagnostic belongs to T04/T06.
+Preparation-edit experiments retain separate evidence. F06 requires review of the
+completed foundation evidence and reproduction packet, not a release decision.
+Held-out and QMD-relative release gates remain T06 work.
 
 ## T02 contract fixtures
 
