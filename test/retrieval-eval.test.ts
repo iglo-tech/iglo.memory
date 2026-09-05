@@ -116,6 +116,8 @@ test('exact 80 allocation, review gate, custody, spans and family leakage', () =
   expect(() => validateLabels(labels(true), sources, 'development')).toThrow('Held-out');
   const all = labels(true);
   all.questions[8]!.family = all.questions[0]!.family;
+  all.questions[8]!.project = 'second-project';
+  sources.set(`second-project/${source}`, 'aa bb');
   expect(() => validateLabels(all, sources, 'complete')).toThrow('family');
   const dev = labels();
   dev.status = 'reviewed';

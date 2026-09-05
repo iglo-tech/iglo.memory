@@ -11,6 +11,7 @@ import {
 } from '@/scripts/retrieval-eval/corpus';
 import { validateLabels } from '@/scripts/retrieval-eval/labels';
 import { capture, runUnit, publishOnce } from '@/scripts/retrieval-eval/records';
+import { summarize } from '@/scripts/retrieval-eval/report';
 import { baselineExcerpts, qmdExcerpts, score } from '@/scripts/retrieval-eval/scoring';
 
 export function qmdProcessEnvironment(value: unknown): Record<string, string | undefined> {
@@ -124,7 +125,7 @@ export async function main(args: string[]) {
     harnessHash: hash(
       (
         await Promise.all(
-          ['cli', 'corpus', 'labels', 'records', 'scoring'].map((name) =>
+          ['cli', 'corpus', 'labels', 'records', 'scoring', 'report'].map((name) =>
             Bun.file(new URL(`./${name}.ts`, import.meta.url)).text(),
           ),
         )
@@ -202,6 +203,7 @@ export async function main(args: string[]) {
     usage: null,
     usageReason: 'Not exposed by stock executable',
     observations,
+    summary: summarize(labels.questions, observations, Number(config.repetitions)),
     failures: observations.filter((r) => r.metrics.failed).length,
     unresolved: observations.filter((r) => r.metrics.unresolved).length,
     counts: corpus.projects.map((p) => ({

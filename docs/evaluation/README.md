@@ -138,9 +138,19 @@ zero usefulness/nDCG; unanswerable errors are failures with null abstention metr
 Misleading rate needs explicit human judgment, even for exact source text.
 
 `pairedBootstrap` accepts paired query means, uses fixed-seed resampling and returns
-95% percentile intervals plus win/tie/loss. The current per-system CLI report does
-not yet join systems, aggregate intervals or implement blinded adjudication imports.
-Those remain T01 work; the pure function is verified by hand fixtures. Candidate
+95% percentile intervals plus win/tie/loss. The per-system CLI report includes per-project/slice counts, query means,
+explicit eligible/scored/missing denominators, unanswerable success/failure and
+judgment denominators, and nearest-rank whole-process p50/p95/max. Missing or
+unjudged repetitions invalidate a query mean; they are never silently dropped.
+The separate observed unanswerable rates use successful calls, with failures and
+unjudged harm counts alongside them. At least three complete repetitions are
+needed to mark the timing sample representative.
+
+`report.ts::compare` computes paired metrics from query means. Callers must first
+check matching corpus/label hashes and cache regimes; differing systems are the
+intended comparison, differing inputs are not. The pure summary/comparison functions
+have hand-calculated fixtures. A joined artifact CLI and blinded adjudication imports
+remain T01 work. Candidate
 recall, all cache regimes and preparation-edit experiments also remain incomplete.
 No report from this checkpoint can pass F06 or a release gate.
 

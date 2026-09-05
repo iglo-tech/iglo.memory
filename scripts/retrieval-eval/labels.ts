@@ -109,7 +109,7 @@ export function validateLabels(
       [...sources.keys()].some((key) => key.startsWith(`${q.project}/`)),
       'Unknown project',
     );
-    const family = `${q.project}/${q.family}`;
+    const family = String(q.family);
     check(
       !families.has(family) || families.get(family) === q.split,
       'Intent family crosses splits',
