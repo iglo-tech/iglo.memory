@@ -1,0 +1,290 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "id": "iglo",
+      "url": "https://github.com/iglo-tech/iglo.memory",
+      "commit": "9670f625661e46935ec1523bb70c6dd8b35d48e4",
+      "license": {
+        "status": "No license at pin; user-owned local evaluation only; do not redistribute corpus",
+        "files": []
+      },
+      "files": [
+        {
+          "original": "PRD.md",
+          "mapped": ".agent/knowledge/PRD.md",
+          "originalHash": "08c10e1cc1381b05099b5e00d192c7c62f1ddae99d46b271982be01ca5942127",
+          "normalizedHash": "08c10e1cc1381b05099b5e00d192c7c62f1ddae99d46b271982be01ca5942127",
+          "bytes": 28743
+        },
+        {
+          "original": "README.md",
+          "mapped": ".agent/knowledge/README.md",
+          "originalHash": "200a47a6baff7b79553ea5bf3656fc9752db1b634fbbe7d821efef760f319259",
+          "normalizedHash": "200a47a6baff7b79553ea5bf3656fc9752db1b634fbbe7d821efef760f319259",
+          "bytes": 6678
+        },
+        {
+          "original": "docs/decisions.md",
+          "mapped": ".agent/knowledge/docs/decisions.md",
+          "originalHash": "ddf8d22087aa8dced0e4c6180a71485c0ea77bcee8de2afcca1a522634a142ca",
+          "normalizedHash": "ddf8d22087aa8dced0e4c6180a71485c0ea77bcee8de2afcca1a522634a142ca",
+          "bytes": 5475
+        },
+        {
+          "original": "docs/verification.md",
+          "mapped": ".agent/knowledge/docs/verification.md",
+          "originalHash": "19320aea075bce516312b3d0fc405ba2cb1cdfad28a41e1ced88b3c607ae14a3",
+          "normalizedHash": "19320aea075bce516312b3d0fc405ba2cb1cdfad28a41e1ced88b3c607ae14a3",
+          "bytes": 4469
+        }
+      ]
+    },
+    {
+      "id": "fastify",
+      "url": "https://github.com/fastify/fastify",
+      "commit": "70b14e92c0b55e8201f5530ba2e6bab4e928c784",
+      "license": {
+        "status": "Upstream notices retained",
+        "files": [
+          {
+            "path": "LICENSE",
+            "hash": "48763b4c2de925a5c107f7319c87fd1ec790f3f5395699939495e571b5ccf21d"
+          }
+        ]
+      },
+      "files": [
+        {
+          "original": "docs/Reference/ContentTypeParser.md",
+          "mapped": ".agent/knowledge/docs/Reference/ContentTypeParser.md",
+          "originalHash": "9e0d75a5981577012aa2cf11899d9c10a52f7bd69cf8a281977850b7a7ca6439",
+          "normalizedHash": "9e0d75a5981577012aa2cf11899d9c10a52f7bd69cf8a281977850b7a7ca6439",
+          "bytes": 8483
+        },
+        {
+          "original": "docs/Reference/Decorators.md",
+          "mapped": ".agent/knowledge/docs/Reference/Decorators.md",
+          "originalHash": "04e1dceb4170f8d7c2c18a47b9285648aa9b65d95d930e105263606628f580e3",
+          "normalizedHash": "04e1dceb4170f8d7c2c18a47b9285648aa9b65d95d930e105263606628f580e3",
+          "bytes": 14797
+        },
+        {
+          "original": "docs/Reference/Encapsulation.md",
+          "mapped": ".agent/knowledge/docs/Reference/Encapsulation.md",
+          "originalHash": "dfad1d4d968b5041e06a78de01df4ca2a1fedd71ed74290aba7d5ac8d998702c",
+          "normalizedHash": "dfad1d4d968b5041e06a78de01df4ca2a1fedd71ed74290aba7d5ac8d998702c",
+          "bytes": 5674
+        },
+        {
+          "original": "docs/Reference/Errors.md",
+          "mapped": ".agent/knowledge/docs/Reference/Errors.md",
+          "originalHash": "46c05c2201a1339a97de3bd7ee8a956f74392ed111f39919f602162719485db9",
+          "normalizedHash": "46c05c2201a1339a97de3bd7ee8a956f74392ed111f39919f602162719485db9",
+          "bytes": 31942
+        },
+        {
+          "original": "docs/Reference/HTTP2.md",
+          "mapped": ".agent/knowledge/docs/Reference/HTTP2.md",
+          "originalHash": "c855b2736c3f2884882a714274988aead527d5b7bf6ef57761d3a218cec4ae26",
+          "normalizedHash": "c855b2736c3f2884882a714274988aead527d5b7bf6ef57761d3a218cec4ae26",
+          "bytes": 2139
+        },
+        {
+          "original": "docs/Reference/Hooks.md",
+          "mapped": ".agent/knowledge/docs/Reference/Hooks.md",
+          "originalHash": "90c5325926bd4b30058e4b6b239cbcf14b77d4091c80b8796995558c19c8044b",
+          "normalizedHash": "90c5325926bd4b30058e4b6b239cbcf14b77d4091c80b8796995558c19c8044b",
+          "bytes": 27711
+        },
+        {
+          "original": "docs/Reference/Index.md",
+          "mapped": ".agent/knowledge/docs/Reference/Index.md",
+          "originalHash": "14a539141a11b1ccfff22271e048e67edc0c781cd88c492f3ac44794f3af4e7f",
+          "normalizedHash": "14a539141a11b1ccfff22271e048e67edc0c781cd88c492f3ac44794f3af4e7f",
+          "bytes": 3783
+        },
+        {
+          "original": "docs/Reference/LTS.md",
+          "mapped": ".agent/knowledge/docs/Reference/LTS.md",
+          "originalHash": "c67bb7629660831a93db4693161bb7100300c8909caee3219f86338a60abe239",
+          "normalizedHash": "c67bb7629660831a93db4693161bb7100300c8909caee3219f86338a60abe239",
+          "bytes": 4553
+        },
+        {
+          "original": "docs/Reference/Lifecycle.md",
+          "mapped": ".agent/knowledge/docs/Reference/Lifecycle.md",
+          "originalHash": "25ab24b0bb490b03000411c5799d0a7183549b49f723c7d9384465e735e62ea1",
+          "normalizedHash": "25ab24b0bb490b03000411c5799d0a7183549b49f723c7d9384465e735e62ea1",
+          "bytes": 3936
+        },
+        {
+          "original": "docs/Reference/Logging.md",
+          "mapped": ".agent/knowledge/docs/Reference/Logging.md",
+          "originalHash": "05698ed84588d9cb51134cbf0b81d55497a5e9342bf84b1e2fa055c905536a38",
+          "normalizedHash": "05698ed84588d9cb51134cbf0b81d55497a5e9342bf84b1e2fa055c905536a38",
+          "bytes": 7038
+        },
+        {
+          "original": "docs/Reference/Middleware.md",
+          "mapped": ".agent/knowledge/docs/Reference/Middleware.md",
+          "originalHash": "64a4f244da14c5133e73255ddf91a59d582c3234921447b9f1e40a8979bc3bfc",
+          "normalizedHash": "64a4f244da14c5133e73255ddf91a59d582c3234921447b9f1e40a8979bc3bfc",
+          "bytes": 2811
+        },
+        {
+          "original": "docs/Reference/Plugins.md",
+          "mapped": ".agent/knowledge/docs/Reference/Plugins.md",
+          "originalHash": "90d57cab62502dfaa58e7edac837fd5db5d80cb4caac3b54bcbd4978c3847cbf",
+          "normalizedHash": "90d57cab62502dfaa58e7edac837fd5db5d80cb4caac3b54bcbd4978c3847cbf",
+          "bytes": 7306
+        },
+        {
+          "original": "docs/Reference/Principles.md",
+          "mapped": ".agent/knowledge/docs/Reference/Principles.md",
+          "originalHash": "e1e8d9e13f27742497fea93f1e89579a74f797945e36eed93da1ac7165241a10",
+          "normalizedHash": "e1e8d9e13f27742497fea93f1e89579a74f797945e36eed93da1ac7165241a10",
+          "bytes": 2567
+        },
+        {
+          "original": "docs/Reference/Reply.md",
+          "mapped": ".agent/knowledge/docs/Reference/Reply.md",
+          "originalHash": "346e2d3cabe269ccd8787228908cd5209a7f469e5633ff1b68247c517672bd5b",
+          "normalizedHash": "346e2d3cabe269ccd8787228908cd5209a7f469e5633ff1b68247c517672bd5b",
+          "bytes": 30484
+        },
+        {
+          "original": "docs/Reference/Request.md",
+          "mapped": ".agent/knowledge/docs/Reference/Request.md",
+          "originalHash": "46ddecaf537ab5b59a5a11b865f361d2b65180cf7669157d64e901d26d982f1f",
+          "normalizedHash": "46ddecaf537ab5b59a5a11b865f361d2b65180cf7669157d64e901d26d982f1f",
+          "bytes": 10016
+        },
+        {
+          "original": "docs/Reference/Routes.md",
+          "mapped": ".agent/knowledge/docs/Reference/Routes.md",
+          "originalHash": "16f4ea4853c78b4ebd85c34ad976079b6b6cb31e7f9cfdb2521bac4cfcf3c4d6",
+          "normalizedHash": "16f4ea4853c78b4ebd85c34ad976079b6b6cb31e7f9cfdb2521bac4cfcf3c4d6",
+          "bytes": 25650
+        },
+        {
+          "original": "docs/Reference/Server.md",
+          "mapped": ".agent/knowledge/docs/Reference/Server.md",
+          "originalHash": "54229338c5a8f3479976ff7b6c479888394e34fd555309a98099809f1689451f",
+          "normalizedHash": "54229338c5a8f3479976ff7b6c479888394e34fd555309a98099809f1689451f",
+          "bytes": 69405
+        },
+        {
+          "original": "docs/Reference/Type-Providers.md",
+          "mapped": ".agent/knowledge/docs/Reference/Type-Providers.md",
+          "originalHash": "12a93542fc9e673434fbce46a54ce3d6f0e7b25ab8873ba14a761858d8e91a8e",
+          "normalizedHash": "12a93542fc9e673434fbce46a54ce3d6f0e7b25ab8873ba14a761858d8e91a8e",
+          "bytes": 6456
+        },
+        {
+          "original": "docs/Reference/TypeScript.md",
+          "mapped": ".agent/knowledge/docs/Reference/TypeScript.md",
+          "originalHash": "3e37101aeeb7ac77ee0c6ddca4d87393438f380100dbce4cab8c104b2b485acf",
+          "normalizedHash": "3e37101aeeb7ac77ee0c6ddca4d87393438f380100dbce4cab8c104b2b485acf",
+          "bytes": 59519
+        },
+        {
+          "original": "docs/Reference/Validation-and-Serialization.md",
+          "mapped": ".agent/knowledge/docs/Reference/Validation-and-Serialization.md",
+          "originalHash": "f7b980759f4b2f93c4a2f3ebbd7aef80d254dfc758246eee2e36ee4460505d8d",
+          "normalizedHash": "f7b980759f4b2f93c4a2f3ebbd7aef80d254dfc758246eee2e36ee4460505d8d",
+          "bytes": 26733
+        },
+        {
+          "original": "docs/Reference/Warnings.md",
+          "mapped": ".agent/knowledge/docs/Reference/Warnings.md",
+          "originalHash": "101f09443ff4a7daa0a831a77668f51f9b90a272e68505512480d90a851d35c4",
+          "normalizedHash": "101f09443ff4a7daa0a831a77668f51f9b90a272e68505512480d90a851d35c4",
+          "bytes": 2774
+        }
+      ]
+    },
+    {
+      "id": "uv",
+      "url": "https://github.com/astral-sh/uv",
+      "commit": "8473ecba11664c70628d776c44f60afefee0b49f",
+      "license": {
+        "status": "Upstream notices retained",
+        "files": [
+          {
+            "path": "LICENSE-MIT",
+            "hash": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c"
+          },
+          {
+            "path": "LICENSE-APACHE",
+            "hash": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+          }
+        ]
+      },
+      "files": [
+        {
+          "original": "docs/concepts/projects/build.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/build.md",
+          "originalHash": "d09d26461c3902584cda148b0228caf0d0d2228d54dcf99616fa2e64ef748558",
+          "normalizedHash": "d09d26461c3902584cda148b0228caf0d0d2228d54dcf99616fa2e64ef748558",
+          "bytes": 2523
+        },
+        {
+          "original": "docs/concepts/projects/config.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/config.md",
+          "originalHash": "22cf7b2322f9bb105126077cdbeafa9fa61aa5a60eb929728d346c5cf3b248fc",
+          "normalizedHash": "22cf7b2322f9bb105126077cdbeafa9fa61aa5a60eb929728d346c5cf3b248fc",
+          "bytes": 23455
+        },
+        {
+          "original": "docs/concepts/projects/dependencies.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/dependencies.md",
+          "originalHash": "a2ca6c06bfc646f7e5c125ec3e26f47fea2b6a8a2bec643f155538e6ba52bb52",
+          "normalizedHash": "a2ca6c06bfc646f7e5c125ec3e26f47fea2b6a8a2bec643f155538e6ba52bb52",
+          "bytes": 27465
+        },
+        {
+          "original": "docs/concepts/projects/index.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/index.md",
+          "originalHash": "ef6c096bc49da7b1265b51e7a59d3fbc1bdb602e688f27c32738c265c401f12f",
+          "normalizedHash": "ef6c096bc49da7b1265b51e7a59d3fbc1bdb602e688f27c32738c265c401f12f",
+          "bytes": 756
+        },
+        {
+          "original": "docs/concepts/projects/init.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/init.md",
+          "originalHash": "8dd331359de7a8c2b60eb929223027747e07f14758d514f685be9ea7a9c7bf4c",
+          "normalizedHash": "8dd331359de7a8c2b60eb929223027747e07f14758d514f685be9ea7a9c7bf4c",
+          "bytes": 8698
+        },
+        {
+          "original": "docs/concepts/projects/layout.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/layout.md",
+          "originalHash": "4d63a4bde2d51e367af17509ea905434acf4298edb2b985f2f201848fda81c69",
+          "normalizedHash": "4d63a4bde2d51e367af17509ea905434acf4298edb2b985f2f201848fda81c69",
+          "bytes": 4730
+        },
+        {
+          "original": "docs/concepts/projects/run.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/run.md",
+          "originalHash": "5fcaf2d1a8e209db1fe42b1d6d8ed48dec019236396ff7f5b27a9b45212320f2",
+          "normalizedHash": "5fcaf2d1a8e209db1fe42b1d6d8ed48dec019236396ff7f5b27a9b45212320f2",
+          "bytes": 3406
+        },
+        {
+          "original": "docs/concepts/projects/sync.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/sync.md",
+          "originalHash": "1c00e8eb6084bebc206fb2e2cb3e4a72b51e20ca455fa67b54d923641b64ab05",
+          "normalizedHash": "1c00e8eb6084bebc206fb2e2cb3e4a72b51e20ca455fa67b54d923641b64ab05",
+          "bytes": 7403
+        },
+        {
+          "original": "docs/concepts/projects/workspaces.md",
+          "mapped": ".agent/knowledge/docs/concepts/projects/workspaces.md",
+          "originalHash": "8895b51b083a0dbdf5be03babab485fd63ef7bb818ec7ab0ed2a8cfae3bb480f",
+          "normalizedHash": "8895b51b083a0dbdf5be03babab485fd63ef7bb818ec7ab0ed2a8cfae3bb480f",
+          "bytes": 8000
+        }
+      ]
+    }
+  ]
+}
