@@ -126,7 +126,7 @@ test('unknown custom models use single-input conservative batches without hidden
 
 test('filesystem preparation preserves a UTF-8 BOM in source coverage and coordinates', async () => {
   const root = setup();
-  const original = '\uFEFF# Heading\r\nPolish dokument.\r\n';
+  const original = '\uFEFF# Heading\r\nPolish dokument.\r\n## Child\r\nBody';
   const normalized = original.replace(/\r\n?/g, '\n');
   await Bun.write(join(root, '.agent/knowledge/bom.md'), original);
   await prepare(root, config, embed, key);
@@ -139,7 +139,11 @@ test('filesystem preparation preserves a UTF-8 BOM in source coverage and coordi
   expect(restored).toBe(normalized);
   expect(source.length).toBe(Array.from(normalized).length);
   expect(source.sourceHash).toBe('sha256:' + sha256(normalized));
-  expect(source.lineStarts).toEqual([0, 11, 28]);
+  expect(source.lineStarts).toEqual([0, 11, 28, 37]);
+  expect(snapshot.chunks.map((chunk) => chunk.headings)).toEqual([
+    ['Heading'],
+    ['Heading', 'Child'],
+  ]);
   for (const chunk of snapshot.chunks) {
     expect(Array.from(normalized).slice(chunk.start, chunk.end).join('')).toBe(chunk.text);
   }

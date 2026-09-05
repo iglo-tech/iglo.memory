@@ -47,6 +47,8 @@ export function chunkSource(
   const text = markdown.replace(/\r\n?/g, '\n');
   const chars = Array.from(text);
   const lines = text.split('\n');
+  // Ignore a leading BOM only for Markdown syntax; source coordinates retain it.
+  if (lines[0]?.startsWith('\uFEFF')) lines[0] = lines[0].slice(1);
   const lineStarts = [0];
   for (let i = 0; i < chars.length; i++) if (chars[i] === '\n') lineStarts.push(i + 1);
   const document: SourceDocument = {
