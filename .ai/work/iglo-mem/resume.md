@@ -1,5 +1,0 @@
-# Delivery resume
-
-Full PRD implementation for Linux x86_64 verified and reviewed at0b9d877; production source3a521ae. All294 rows accounted:292 verified,2 user-amended and replacement tested,0 pending. AllT01–T10 reviewed. Live saved-key OpenRouter,35 tests/292 assertions/types,PTY,CLI,clean machine,12k saves,committed worktrees and10k-chunk latency PASS. Hosted push+PR runs33964026774/33964028645 PASS; downloaded artifact9968846191 also PASS in clean container. All three final lanes PASS; previous findings preserved.
-
-PR #1 is ready for review, not merged: https://github.com/iglo-tech/iglo.memory/pull/1. Metadata head d757f6c passed both hosted runs33964333331/33964335346. No scope item or user input remains. Final lessons/status save changes no source/build/test code; finish checks its final pushed head before ending. Other OS/CPU ports remain unverified future work; no tagged release. User-owned .agent/ and saved credentials remain intact. Read-only retro lessons saved separately; finish.md controls delivery Status.

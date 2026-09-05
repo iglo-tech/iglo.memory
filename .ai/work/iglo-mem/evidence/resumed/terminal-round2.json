@@ -1,1 +1,0 @@
-{"terminal": "PASS", "hidden_entry": "PASS", "cancel_eof_restore": "PASS", "reset": "PASS", "saved_reuse_linked_worktree": "PASS", "startup_isolation": "PASS", "five_commands_no_runtime_on_PATH": "PASS", "cleanup": "temporary fixtures removed on exit"}

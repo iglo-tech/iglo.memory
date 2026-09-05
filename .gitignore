@@ -1,3 +1,7 @@
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Local task state and execution evidence, not maintained project documentation.
+.ai/work/
+.ai/cezar/

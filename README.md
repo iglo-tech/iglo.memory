@@ -138,7 +138,7 @@ For source development use the absolute path to `scripts/run.sh`. The supported
 launcher and compiled build disable repository dotenv and Bun preload loading.
 Do not use bare `bun src/cli.ts` from an untrusted repository.
 
-Tests use disposable repositories, homes and dummy credentials. API contract
-and ranking fixtures are deterministic mocks; they do not establish live-provider
-relevance. See `.ai/work/iglo-mem/evidence/` for live-provider, downloaded-build, concurrency and measured performance proof.
-Other platforms require separate verification before being advertised.
+Tests use disposable repositories, homes and dummy credentials. See
+[reproducing verification](docs/verification.md) for CLI, terminal, clean-machine,
+benchmark and live-provider checks, and [design decisions](docs/decisions.md)
+for the reasoning behind credentials, chunking, snapshots and locking.
