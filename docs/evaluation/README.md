@@ -204,3 +204,17 @@ mappings and coordinates that do not reproduce the exact excerpt. It rescales no
 raw score and rewrites no captured response: source evidence is scored again with
 the reviewed additions. Missing judgments remain unknown. An explicit misleading
 judgment can be recorded even when source-coordinate ambiguity remains unresolved.
+
+## Token-budget helpers
+
+`token-budget.ts` contains offline cl100k embedding counts, serialized o200k chat
+counts, deterministic digest-bearing context previews and lossless wrapped source
+ranges. See the [token contract](../specs/retrieval-v2-token-contract.md). These are
+evaluation helpers pending production integration. Chat counts describe serialized
+text; provider-added framing is measured separately. No unknown model silently
+inherits a claimed exact tokenizer.
+
+js-tiktoken 1.0.21 is pinned in the lockfile; its package git revision is
+`4c8b748e07992c00386f3180af5c574b27b65139`. MIT notices for it and base64-js are in
+`licenses/`. Exact rank hashes and the isolated executable proof are recorded in
+[the token-budget research](../../.ai/research/retrieval-v2-token-budget.md).

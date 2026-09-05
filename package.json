@@ -10,6 +10,9 @@
     "build": "sh scripts/build.sh",
     "qa": "sh scripts/build.sh && python3 scripts/qa-terminal.py"
   },
+  "dependencies": {
+    "js-tiktoken": "1.0.21"
+  },
   "devDependencies": {
     "@types/bun": "1.4.1",
     "oxfmt": "0.66.0",
