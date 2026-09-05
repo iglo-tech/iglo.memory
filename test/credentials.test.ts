@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { chmodSync, mkdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, linkSync, mkdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { saveCredential, resolveCredential } from '../src/credentials';
 import { cleanup, cli, fixture, repository } from './helpers';
@@ -54,9 +54,10 @@ test('real init JSON, saved reuse across repositories, preservation and noninter
 test('concurrent successful saves leave one complete value and last completed save wins',async()=>{
   const home=fixture();saveCredential('initial',home);
   const module=join(import.meta.dir,'../src/credentials.ts');const trusted=join(home,'trusted.toml');writeFileSync(trusted,'');
-  const start=(key:string)=>Bun.spawn([process.execPath,'--no-env-file',`--config=${trusted}`,'-e',`import {saveCredential} from ${JSON.stringify(module)};for(let i=0;i<20;i++)saveCredential(${JSON.stringify(key)},${JSON.stringify(home)});`],{stdout:'pipe',stderr:'pipe'});
-  const children=[start('dummy-A'),start('dummy-B')];
-  for(const child of children)expect(await child.exited).toBe(0);
+  const start=(key:string)=>Bun.spawn([process.execPath,'--no-env-file',`--config=${trusted}`,'-e',`import {saveCredential} from ${JSON.stringify(module)};for(let i=0;i<500;i++)saveCredential(${JSON.stringify(key)},${JSON.stringify(home)});`],{stdout:'pipe',stderr:'pipe'});
+  const children=[start('dummy-A'),start('dummy-B'),start('dummy-A'),start('dummy-B')];
+  const exits=await Promise.all(children.map(child=>child.exited));
+  expect(exits).toEqual([0,0,0,0]);
   expect(['dummy-A','dummy-B']).toContain(resolveCredential(home,'')!.key);
   saveCredential('final-dummy',home);expect(resolveCredential(home,'')?.key).toBe('final-dummy');
 });
@@ -78,4 +79,13 @@ test('ordinary dotfiles repositories below home reject saved credential reads an
       expect(resolveCredential(home,'override-dummy')?.source).toBe('environment');
     }
   }
+});
+
+test('hard-linked credential files are rejected without replacing either link', () => {
+  const home=fixture();saveCredential('dummy',home);
+  const path=join(home,'.config/iglo.mem/credentials.json');const alias=join(home,'alias');
+  linkSync(path,alias);const original=readFileSync(path);
+  expect(()=>resolveCredential(home,'')).toThrow('Saved credentials');
+  expect(()=>saveCredential('replacement',home)).toThrow('Saved credentials');
+  expect(readFileSync(path)).toEqual(original);expect(readFileSync(alias)).toEqual(original);
 });

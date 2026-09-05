@@ -7,7 +7,8 @@ import { atomicWrite, checkAncestors, directory, exists, readBytes, record } fro
 export type Credential = { key: string; source: 'environment' | 'saved' | 'entered' };
 function secure(path: string, kind: 'file' | 'directory') {
   const s = lstatSync(path);
-  if ((kind === 'file' ? !s.isFile() || s.nlink !== 1 : !s.isDirectory())
+  // A concurrent atomic replacement can unlink the inode returned by lstat (nlink 0).
+  if ((kind === 'file' ? !s.isFile() || s.nlink > 1 : !s.isDirectory())
     || (s.mode & 0o077) !== 0 || (process.getuid && s.uid !== process.getuid())) throw new AppError('CREDENTIALS_INVALID');
 }
 function location(home: string, create: boolean): string {
