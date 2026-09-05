@@ -1,4 +1,19 @@
-# Build resume
+# Delivery resume
+
+Step 8 finish: NEEDS_HUMAN; partial delivery, PR #1 remains draft at fd19c82.
+Live GitHub reports MERGEABLE/CLEAN, no checks, no required branch checks or
+approval/rulesets. No CI/conflict repair needed. Module evidence remains PASS;
+final verification blocked and all final review lanes NOT_RUN. Coverage 0/294,
+T01–T10 blocked. Finish report: evidence/finish/report.md; read-only retro
+lessons: evidence/finish/retro.md (report COMPLETE is not delivery completion).
+No code/PR mutation, merge, release or worktree removal. Step 6–8 artifacts
+remain local and uncommitted; preserve them when resuming.
+Next: obtain pending D03 same-user relocation threat-model and D01 chunking
+answers, resume build at D03 G01–G05, then T01 I01–I13, T02 E01–E07 and the
+remaining DAG. D02/D04/D05 still open. Run task verification/review and full
+integrated QA/final reviews before PR readiness. Merge is not requested.
+
+Step 6 verify: NEEDS_HUMAN; final product verification not entered. At fd19c82, 12 module tests/79 assertions, strict types, setup and whitespace pass; source matches reviewed da10482. All 294 coverage rows remain pending, T01–T10 blocked. Evidence: .ai/work/iglo-mem/evidence/final-verification/{report.md,checks.txt,frontier.json}. Await existing D01/D03 answers; then build/verify/review all remaining tasks before integrated QA. No source changes or QA approval.
 
 Step 5 build is partial and BLOCKED. No no-action outcome or scope reduction.
 Independent T01 argument parsing, redacted errors, physical worktree discovery

@@ -4,7 +4,9 @@
   "type": "module",
   "packageManager": "bun@1.4.2",
   "scripts": {
-    "test": "sh scripts/check.sh"
+    "test": "sh scripts/check.sh",
+    "build": "sh scripts/build.sh",
+    "qa": "sh scripts/build.sh && python3 scripts/qa-terminal.py"
   },
   "devDependencies": {
     "@types/bun": "1.4.1",

@@ -1,6 +1,8 @@
 # iglo.mem delivery plan
 
-Planning status: COMPLETE as a map; product status: PARTIAL, BLOCKED. Current frontier: build starts D03 proof and independent T01 tooling after T00 preflight READY. First implementation task: T01 secure init. Do not interpret any prior step's DONE marker as product delivery.
+Current authority: [accepted user amendments](../../specs/accepted-amendments.md). D01 and credential threat-model decision D03 are resolved. Earlier hard size/overlap and adversarial same-user credential requirements are superseded; prior evidence/status below is historical. Product implementation and index-lock proof resume; no coverage is inferred.
+
+Planning status: COMPLETE as a map; product status: PARTIAL, BLOCKED. Current frontier: step 6 final-verification gate blocked; reviewed T01 modules exist, D03 proof failed, D01/D03 answers pending. First implementation task: T01 secure init. Do not interpret any prior step's DONE marker as product delivery.
 
 Destination: the complete [PRD](../../../PRD.md) §§1–18: standalone repository-local semantic Markdown memory with secure shared credentials, explicit incremental preparation, snapshot-only ranked search, status, safe GC and isolated worktrees.
 
@@ -73,7 +75,7 @@ Measure the actual compiled binary, 10,000 active chunks, 1,536 and 3,072 dimens
 
 ## Current frontier and handoff
 
-- Current: step 4 specify complete; T00 preflight READY, D01–D05 open. Product work has not started.
+- Current: step 6 frontier audit complete; T00 preflight READY, partial T01 modules reviewed, T01–T10 blocked. D01–D05 remain open.
 - Next: build runs the spec D03 G01–G05 disposable proof, records the binding/identity decision and adds independent T01 tooling/startup controls. Implement secure saves only after proof; verify I01–I13, then T02 E01–E07. Retain full T00–T10 coverage.
 - Required open questions: D01 chunk acceptance, D02 release/platform security, D03 lock feasibility, D04 populated cache contract, D05 quality/performance details. None requires user input to finish this planning step.
 - Branch: `cez/32300cb2`; base HEAD: `12f3514c91ae138f0c7c4729224c4279065b278f`.
@@ -85,3 +87,5 @@ Step 5 frontier: D03 selected custom embedded Node-API directory-lock experiment
 Step 5 result: independent T01 argument/config/resolver modules pass 10 tests and strict types (evidence/T01/verify.md). D03 probe failed G05 relocation containment; immediate revalidation also failed (evidence/D03/probe.md). T01 credential work and dependent tasks remain blocked. D01 and D03 user decisions pending; D02/D04/D05 unchanged. No task T01–T10 or full requirement is verified.
 
 Checkpoint: implementation da10482 passes all three independent round-2 reviews (evidence/T01/review-round2.md); 12 tests/79 assertions and strict types pass. Draft PR #1: https://github.com/iglo-tech/iglo.mem/pull/1. This is partial module acceptance only; no T01–T10 task/PRD row is complete. Next action awaits D01/D03 decisions; resume.md pins the exact frontier.
+
+Step 6: final verification NOT ENTERED because no product task is reviewed. At fd19c82, 12 tests/79 assertions, strict types, setup and whitespace pass; implementation matches reviewed da10482. All 294 coverage rows remain pending. [Gate report](evidence/final-verification/report.md) records scenarios, uncovered IDs and skipped integrated proof. Status NEEDS_HUMAN; retain D01/D03 decisions and all downstream blockers.

@@ -1,5 +1,7 @@
 # PRD requirement coverage
 
+Current authority: [accepted user amendments](../../specs/accepted-amendments.md). D01 and credential threat-model decision D03 are resolved. Earlier hard size/overlap and adversarial same-user credential requirements are superseded; prior evidence/status below is historical. Product implementation and index-lock proof resume; no coverage is inferred.
+
 Authority: original [PRD](../../../PRD.md) at `12f3514c91ae138f0c7c4729224c4279065b278f`, SHA-256 `08c10e1cc1381b05099b5e00d192c7c62f1ddae99d46b271982be01ca5942127`.
 
 Each prose paragraph, list item and format/example block has a stable source-unit ID below. This deliberately includes explanatory text/examples so no normative prose between bullets is dropped. Examples retain their illustrative status; their particular sample counts/strings are not new requirements. Line links pin interpretation to the unchanged source; ranges identify the entire unit. IDs are permanent: append new IDs for future amendments, do not renumber existing rows.
@@ -7,6 +9,8 @@ Each prose paragraph, list item and format/example block has a stable source-uni
 Task definitions, dependencies and acceptance checks: [plan](plan.md). Detailed I01–I13, E01–E07 and feasibility G01–G05 scenarios: [spec](../../specs/iglo-mem-next.md). Every listed task owns this row jointly where multiple tasks appear. For later specs, cite these IDs as well as PRD sections. Full task completion includes all mapped source requirements, even where a provisional task summary is shorter.
 
 Partial module evidence exists at [T01 verification](evidence/T01/verify.md), and failed feasibility evidence at [D03 probe](evidence/D03/probe.md). No complete product requirement is verified. Replace “pending” only with actual test/QA/review artifact paths and verified commit; planned checks are not evidence. Each eventual artifact must name the requirement IDs it proves. Evidence can be shared across rows but cannot be inferred merely from a green task status. Negative/excluded requirements need access/network/process traces or architecture/package inspection as appropriate. Section 17 acceptance and section 18 DoD are each individually mapped below, including repeated obligations.
+
+Step 6 audit at `fd19c82`: all 294 source units remain pending; [gate report](evidence/final-verification/report.md) and [enumerated uncovered IDs](evidence/final-verification/frontier.json). Final integrated verification is blocked by the review frontier.
 
 | Requirement ID | PRD source | Requirement / source text | Tasks | Eventual evidence / state |
 | --- | --- | --- | --- | --- |

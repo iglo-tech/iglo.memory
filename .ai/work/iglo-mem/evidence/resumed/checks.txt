@@ -1,0 +1,55 @@
+bun test v1.4.2 (744846f84)
+
+test/chunks.test.ts:
+(pass) all lengths share the same block pipeline with intact giant blocks and source lines [14.04ms]
+(pass) headings, preamble, fenced/indented code and empty documents [0.31ms]
+(pass) fixed roots, exclusions, deterministic paths and source symlink rejection [2.87ms]
+
+test/index.test.ts:
+(pass) real offline empty prepare/search/status/gc CLI and no implicit refresh [139.17ms]
+(pass) prepare/reuse/edit/failure/delete/GC with snapshot-only search and orphan reuse [7.33ms]
+(pass) missing vector status, corrupt vector failure, profile mismatch and safe GC authority [2.15ms]
+(pass) 65 unique inputs use 64+1 batches and a failed later batch leaves reusable orphans [11.92ms]
+(pass) simultaneous real command processes publish and read complete worktree-local snapshots [226.77ms]
+
+test/embedding.test.ts:
+(pass) OpenRouter body, index mapping and float32 validation [0.82ms]
+(pass) duplicate/missing indices, wrong dimensions and malformed payload fail without retries [0.40ms]
+(pass) bounded transient retries, Retry-After and permanent failure redaction [0.68ms]
+
+test/repository.test.ts:
+(pass) physical nested cwd resolves the nearest normal worktree [1.23ms]
+(pass) relative linked gitfile uses worktree root, not common administration [0.35ms]
+(pass) malformed nearest markers never fall through to enclosing repository [0.67ms]
+(pass) bare, absent, malformed and symlink markers fail [0.60ms]
+(pass) configuration read preserves bytes and ignores unsupported fields [0.43ms]
+(pass) invalid configuration values fail [0.13ms]
+(pass) missing, malformed and static symlink configuration paths fail [0.46ms]
+(pass) ordinary source folders with administrative-looking names remain inside the worktree [0.24ms]
+(pass) HEAD reference grammar rejects malformed names and preserves valid detached heads [0.95ms]
+
+test/lock.test.ts:
+(pass) bounded contention, different directory independence, kill recovery and no persistent lock writes [85.42ms]
+
+test/credentials.test.ts:
+(pass) shared saved credentials, override precedence and explicit replacement [2.82ms]
+(pass) reject repository-contained storage and symlinks; reset may replace malformed safe contents [1.93ms]
+(pass) real init JSON, saved reuse across repositories, preservation and noninteractive failure [218.45ms]
+(pass) concurrent successful saves leave one complete value and last completed save wins [43.11ms]
+
+test/failures.test.ts:
+(pass) failed credential save retains old bytes and leaves no temporary file [1.14ms]
+(pass) failed snapshot publication preserves previous bytes and orphan data can be reused [4.43ms]
+
+test/arguments.test.ts:
+(pass) command contract > only the five commands and explicit reset are accepted [0.38ms]
+(pass) command contract > invalid arguments are rejected without reflecting them [0.50ms]
+(pass) command contract > unexpected failures never expose the exception message [0.07ms]
+
+test/ranking.test.ts:
+(pass) exact identifiers break semantic ties; results deduplicate, cap and stay deterministic [2.61ms]
+
+ 31 pass
+ 0 fail
+ 247 expect() calls
+Ran 31 tests across 9 files. [813.00ms]

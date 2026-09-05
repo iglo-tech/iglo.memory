@@ -1,5 +1,7 @@
 # iglo.mem design decisions
 
+Current authority: [accepted user amendments](../specs/accepted-amendments.md). D01 and credential threat-model decision D03 are resolved. Earlier hard size/overlap and adversarial same-user credential requirements are superseded; prior evidence/status below is historical. Product implementation and index-lock proof resume; no coverage is inferred.
+
 Status: READY_FOR_SPEC for responsibility boundaries; detailed contracts below remain open. This is the deep-design output for [the brief](iglo-mem.md). There are no existing production symbols or established ADR directory. These cross-cutting decisions are kept together here for specification and review; proposed function names are illustrative, not existing APIs.
 
 ## Current seam and chosen ownership

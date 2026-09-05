@@ -1,5 +1,7 @@
 # iglo.mem: first two implementation slices
 
+Current authority: [accepted user amendments](accepted-amendments.md). D01 and credential threat-model decision D03 are resolved. Earlier hard size/overlap and adversarial same-user credential requirements are superseded; prior evidence/status below is historical. Product implementation and index-lock proof resume; no coverage is inferred.
+
 Status: step 4 specification complete for the next frontier. T01/T02 observable contracts are specified; D03 implementation feasibility remains required before dependent secure storage work. T00 preflight is READY. Full-product contract is NOT complete. Independent T01 modules now exist; partial verification and a failed D03 probe are recorded in the plan. Full T01/T02 product verification remains blocked.
 
 Authority: [PRD](../../PRD.md), [brief](../briefs/iglo-mem.md), [design](../briefs/iglo-mem-design.md), [research](../research/prd-feasibility.md). Full scope, decision gates and requirement coverage live in [plan](../work/iglo-mem/plan.md). PRD SHA-256: `08c10e1cc1381b05099b5e00d192c7c62f1ddae99d46b271982be01ca5942127`.
