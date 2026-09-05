@@ -11,7 +11,7 @@
     ]
   },
   "providers": {
-    "tracker": "github:iglo-tech/iglo.mem"
+    "tracker": "github:iglo-tech/iglo.memory"
   },
   "paths": {
     "briefs": ".ai/briefs",
