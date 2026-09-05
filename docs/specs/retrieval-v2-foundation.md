@@ -1,5 +1,8 @@
 # Retrieval v2: first ready slices and evaluation protocol
 
+Evaluation authority: the [agent evaluation amendment](retrieval-v2-agent-evaluation.md)
+supersedes human testing, review and custody requirements below.
+
 Status: implementation pending. Parent contract: [retrieval-v2.md](retrieval-v2.md).
 
 ## goal

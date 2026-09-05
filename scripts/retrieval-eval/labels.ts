@@ -34,7 +34,7 @@ export type Question = {
 export type Labels = {
   version: 1;
   status: 'draft' | 'reviewed';
-  reviews: { reviewer: string; kind: 'human'; revision: string }[];
+  reviews: { reviewer: string; kind: 'human' | 'agent'; revision: string }[];
   adjudication: string | null;
   questions: Question[];
 };
@@ -63,19 +63,19 @@ export function validateLabels(
   for (const item of root.reviews) {
     const r = object(item);
     check(
-      r.kind === 'human' &&
+      (r.kind === 'human' || r.kind === 'agent') &&
         typeof r.reviewer === 'string' &&
         r.reviewer.trim() &&
         typeof r.revision === 'string' &&
         r.revision.trim(),
-      'Invalid human review record',
+      'Invalid review record',
     );
     reviewers.add(r.reviewer);
   }
   if (root.status === 'reviewed')
     check(
       reviewers.size >= 2 && typeof root.adjudication === 'string' && root.adjudication.trim(),
-      'Two human reviews and adjudication required',
+      'Two distinct reviews and adjudication required',
     );
   const ids = new Set<string>();
   const families = new Map<string, string>();

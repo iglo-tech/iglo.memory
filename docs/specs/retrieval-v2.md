@@ -1,5 +1,8 @@
 # Retrieval v2 specification
 
+Evaluation authority: the [agent evaluation amendment](retrieval-v2-agent-evaluation.md)
+supersedes human testing, review and custody requirements below.
+
 Status: implementation pending. Start with RV2-T01 and RV2-T02 in
 [the foundation specification](retrieval-v2-foundation.md).
 

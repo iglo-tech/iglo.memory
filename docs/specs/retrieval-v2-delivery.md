@@ -1,5 +1,8 @@
 # Retrieval v2 delivery frontier
 
+Evaluation authority: the [agent evaluation amendment](retrieval-v2-agent-evaluation.md)
+supersedes human testing, review and custody requirements below.
+
 Status: specified for RV2-T01 offline work and RV2-T02 contract fixtures.
 Neither task is verified. T03 remains blocked on reviewed foundation evidence.
 

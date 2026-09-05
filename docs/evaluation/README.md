@@ -56,9 +56,11 @@ Development JSON must contain exactly 30 questions with the specified 8/6/4/4/4/
 allocation. `validateLabels(..., 'complete')` additionally validates all 80 and the
 50 held-out allocation. Only the evaluator may use that function on held-out inputs.
 The CLI always rejects held-out records. It does not generate held-out questions.
-Two distinct human review records and an adjudication reference are required to
-record reviewed status. Schema checks cannot prove human participation; the evaluator
-must inspect that ledger and keep held-out custody until the T06 freeze.
+Two distinct review records and an adjudication reference are required to record
+reviewed status. Per the [agent evaluation amendment](../specs/retrieval-v2-agent-evaluation.md),
+reviewers may be agents or humans; `kind` preserves that provenance. Schema checks
+cannot prove the work was performed. The evaluator inspects the ledger and keeps
+held-out custody until the T06 freeze.
 
 Drafts and reviewer identities belong outside Git. The eventual reviewed benchmark
 is published only after held-out evaluation. Add `labels` to the config above and run:

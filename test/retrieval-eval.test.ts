@@ -121,10 +121,36 @@ test('exact 80 allocation, review gate, custody, spans and family leakage', () =
   expect(() => validateLabels(all, sources, 'complete')).toThrow('family');
   const dev = labels();
   dev.status = 'reviewed';
-  expect(() => validateLabels(dev, sources, 'development')).toThrow('human');
+  expect(() => validateLabels(dev, sources, 'development')).toThrow('Two distinct reviews');
   dev.status = 'draft';
   dev.questions[0]!.evidence = [{ ...q.evidence[0]!, end: 20 }];
   expect(() => validateLabels(dev, sources, 'development')).toThrow('span');
+});
+test('review ledger accepts truthful agent provenance and preserves human records', () => {
+  const sources = new Map([[`p/${source}`, 'aa bb']]);
+  const dev = labels();
+  dev.status = 'reviewed';
+  dev.adjudication = 'fixture-adjudication';
+  dev.reviews = [
+    { reviewer: 'first', kind: 'agent', revision: 'fixture-v1' },
+    { reviewer: 'second', kind: 'human', revision: 'fixture-v1' },
+  ];
+  expect(validateLabels(dev, sources, 'development').reviews.map((r) => r.kind)).toEqual([
+    'agent',
+    'human',
+  ]);
+  dev.reviews[1]!.reviewer = 'first';
+  expect(() => validateLabels(dev, sources, 'development')).toThrow('Two distinct');
+  dev.reviews[1]!.reviewer = 'second';
+  expect(() =>
+    validateLabels(
+      { ...dev, reviews: [{ ...dev.reviews[0], kind: 'unknown' }] },
+      sources,
+      'development',
+    ),
+  ).toThrow('Invalid review');
+  dev.reviews[0]!.revision = '';
+  expect(() => validateLabels(dev, sources, 'development')).toThrow('Invalid review');
 });
 test('corpus rejects collisions and altered normalized bytes', async () => {
   const root = await mkdtemp(join(tmpdir(), 'rv2-corpus-'));
