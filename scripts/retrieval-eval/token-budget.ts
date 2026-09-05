@@ -64,28 +64,63 @@ export function splitWrapped(text: string, prefix: string, limit: number): Token
   const chars = Array.from(text),
     spans: TokenSpan[] = [];
   let start = 0;
+  // A token spans a finite number of UTF-8 bytes. Derive the exact bound from
+  // the pinned vocabulary for the rare nonmonotone fallback, not from a
+  // characters-per-token estimate.
+  let tokenBytes: number | undefined;
+  const maximumTokenBytes = () => {
+    if (tokenBytes === undefined) {
+      tokenBytes = 0;
+      for (const line of cl100k.bpe_ranks.split('\n'))
+        for (const token of line.split(' ').slice(2))
+          tokenBytes = Math.max(tokenBytes, atob(token).length);
+    }
+    return tokenBytes;
+  };
+  const fits = (from: number, end: number) =>
+    embeddingTokens(prefix + chars.slice(from, end).join('')) <= limit;
+  const canBegin = (from: number) => {
+    if (from === chars.length || fits(from, from + 1)) return true;
+    const maximum = Math.min(chars.length, from + limit * maximumTokenBytes());
+    for (let end = from + 2; end <= maximum; end++) if (fits(from, end)) return true;
+    return false;
+  };
   while (start < chars.length) {
+    const window = Math.min(chars.length - start, 32768);
+    // Do not fragment an already fitting remainder, particularly when a single
+    // BPE token combines several characters or leading whitespace with an emoji.
+    if (window === chars.length - start && fits(start, chars.length)) {
+      const body = chars.slice(start).join('');
+      spans.push({ start, end: chars.length, text: body, tokens: embeddingTokens(prefix + body) });
+      break;
+    }
     let low = 1,
-      high = Math.min(chars.length - start, limit * 4, 32768),
+      high = window,
       fitting = 0;
-    // BPE counts need not be monotone. A found prefix is rechecked; maximality is
-    // not required for losslessness or safety, and no skipped suffix is inferred.
     while (low <= high) {
       const length = Math.floor((low + high) / 2);
-      if (embeddingTokens(prefix + chars.slice(start, start + length).join('')) <= limit) {
+      if (fits(start, start + length)) {
         fitting = length;
         low = length + 1;
       } else high = length - 1;
+    }
+    // Binary search supplies a fast candidate, never evidence of impossibility.
+    // Search every possible fitting span before rejecting nonmonotone prefixes.
+    if (!fitting || !canBegin(start + fitting)) {
+      fitting = 0;
+      const maximum = Math.min(chars.length - start, limit * maximumTokenBytes());
+      for (let length = maximum; length > 0; length--)
+        if (fits(start, start + length) && canBegin(start + length)) {
+          fitting = length;
+          break;
+        }
     }
     check(fitting > 0, 'Minimum source span exceeds token budget');
     let end = start + fitting;
     for (const boundary of [(c: string) => c === '\n', (c: string) => /\s/u.test(c)]) {
       let found = false;
       for (let i = end - 1; i >= start; i--)
-        if (
-          boundary(chars[i]!) &&
-          embeddingTokens(prefix + chars.slice(start, i + 1).join('')) <= limit
-        ) {
+        if (boundary(chars[i]!) && fits(start, i + 1) && canBegin(i + 1)) {
           end = i + 1;
           found = true;
           break;

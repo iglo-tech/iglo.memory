@@ -51,3 +51,18 @@ test('wrapped split preserves every code point, fence and separator under exact 
   expect(() => splitWrapped('body', prefix, 1)).toThrow('Wrapper');
   expect(() => splitWrapped('😀', '', 1)).toThrow('Minimum');
 });
+
+test('nonmonotone BPE prefixes and whitespace joins never reject fitting text', () => {
+  const prefix = boundedContext('p', 'a', []).prefix;
+  expect(embeddingTokens(prefix + '删除')).toBe(8);
+  expect(
+    splitWrapped('删除', prefix, 8)
+      .map((s) => s.text)
+      .join(''),
+  ).toBe('删除');
+  for (const text of ['删除', ' 🙂', '删除'.repeat(30), ' 🙂'.repeat(30)]) {
+    const spans = splitWrapped(text, '', 1);
+    expect(spans.map((s) => s.text).join('')).toBe(text);
+    expect(spans.every((s) => embeddingTokens(s.text) <= 1)).toBe(true);
+  }
+});
