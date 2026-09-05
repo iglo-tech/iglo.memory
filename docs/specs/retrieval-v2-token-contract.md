@@ -129,3 +129,39 @@ vectors. Keep the independent maximum of 64 inputs per batch. Successful calls
 reported $0.01200002; rejected-call usage remains unknown. Default-route sizing
 uses the verified 8192-per-input and 300000-aggregate limits; custom-route sizing
 remains the conservative byte-target/repartition policy above.
+
+## T02 integration decisions
+
+This contract supersedes D02's initial `project-path-ancestry-v2` labeled-line
+wrapper with version **`context-json-v2`**: `Context: `, the JSON array described
+above, two newlines, and the exact source body. Both full and shortened forms use
+that version; shortened arrays begin with the full-context digest. T03 records
+this version in passage/snapshot identities. This is a deliberate format decision,
+not an assertion that the initial and final formats produce identical embeddings.
+
+Keep embedding and chat metadata budgets separate. Embedding context is at most
+256 **cl100k** tokens, as implemented by `boundedContext`. Chat candidates send
+`id`, `path`, `headings` and complete `text`. Bound the serialized JSON object
+`{path, headings}` to 256 **o200k** tokens before assembling a request. If it does
+not fit, replace headings with a full-metadata SHA-256 marker and shortened last
+heading, and shorten the path deterministically from its beginning, retaining its
+suffix. Repeatedly halve the longest preview by Unicode code points until the
+serialized object fits. Hash the original path and complete heading array;
+retain them unshortened in the snapshot for provenance and display. The marker
+remains when both previews become empty. Count IDs and schema/request framing
+again in the complete serialized request; the per-candidate bound does not replace
+that final check. Implement this chat-specific serializer during integration.
+
+Keep the original query unchanged. Reject before dispatch if its complete default
+embedding input exceeds 8192 cl100k tokens or its complete chat request exceeds
+65536 o200k tokens. Unknown custom embedding models follow the explicit provider
+size-failure policy rather than an invented tokenizer limit. Never shorten the
+question, discard protected candidates or clip passage bodies to fit a request.
+T03 chooses passage limits within this contract; a request that still cannot fit
+fails explicitly. No separate 4096-token query limit is introduced.
+
+F07–F10 have verified evaluation evidence; these version and metadata/query
+clarifications resolve the remaining F11/G02 decisions. G01 is supported by the
+measured route/payload probes. T02 exit review still requires independent review
+of these final clarifications. T01's full-candidate diagnostic and timing evidence
+remain separate prerequisites to T03.
