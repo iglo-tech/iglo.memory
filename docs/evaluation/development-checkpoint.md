@@ -54,11 +54,11 @@ reranking window. The 324 unique windows received two independent semantic revie
 and 32 explicit adjudications. Saved rank order is unchanged.
 
 | Surface, 26 answerable development questions | Useful at rank 1 | Useful within 8 |
-| --- | ---: | ---: |
-| Baseline native excerpt | 12/26 | 17/26 |
-| Baseline complete prepared chunk | 21/26 | 26/26 |
-| QMD native excerpt | 5/26 | 9/26 |
-| QMD selected window before model truncation | 13/26 | 20/26 |
+| -------------------------------------------- | ---------------: | --------------: |
+| Baseline native excerpt                      |            12/26 |           17/26 |
+| Baseline complete prepared chunk             |            21/26 |           26/26 |
+| QMD native excerpt                           |             5/26 |            9/26 |
+| QMD selected window before model truncation  |            13/26 |           20/26 |
 
 Baseline excerpts use the stock 400-code-point limit; QMD excerpts use its stock
 300-UTF-16-unit presentation. QMD may further tokenize and truncate its reranking

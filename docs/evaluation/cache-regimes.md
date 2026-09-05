@@ -12,11 +12,11 @@ models. Runtime is Bun 1.4.2 on an AMD Ryzen 5 1600 CPU. Input manifests retain 
 source, adapter, snapshot and hardware identities. No inference settings or ranking
 rules were changed to improve results.
 
-| Question/project | Cold whole CLI, seconds | Novel warm API, seconds | Repeated warm API, milliseconds |
-| --- | --- | --- | --- |
-| d01/iglo | 40.807 / 42.946 / 40.842 | 34.326 / 34.023 / 34.311 | 246 / 190 / 186 |
-| d06/uv | 77.713 / 79.059 / 77.556 | 71.562 / 71.344 / 71.616 | 272 / 288 / 191 |
-| d07/Fastify | 166.213 / 193.430 / 138.034 | 135.377 / 144.418 / 138.377 | 232 / 238 / 221 |
+| Question/project | Cold whole CLI, seconds     | Novel warm API, seconds     | Repeated warm API, milliseconds |
+| ---------------- | --------------------------- | --------------------------- | ------------------------------- |
+| d01/iglo         | 40.807 / 42.946 / 40.842    | 34.326 / 34.023 / 34.311    | 246 / 190 / 186                 |
+| d06/uv           | 77.713 / 79.059 / 77.556    | 71.562 / 71.344 / 71.616    | 272 / 288 / 191                 |
+| d07/Fastify      | 166.213 / 193.430 / 138.034 | 135.377 / 144.418 / 138.377 | 232 / 238 / 221                 |
 
 Cold measurements launch the unmodified stock CLI on a disposable copy of the
 prepared database with an empty expansion/rerank cache. Process-local models begin
