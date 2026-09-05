@@ -53,10 +53,17 @@ export function qmdExcerpts(
     check(typeof r.file === 'string' && typeof r.snippet === 'string', 'Invalid QMD result');
     const prefix = `qmd://${project}/`;
     check(r.file.startsWith(prefix), 'QMD returned another collection');
-    const source = `.agent/knowledge/${r.file.slice(prefix.length)}`;
+    const url = new URL(r.file);
+    check(url.search === '' || url.search === `?index=${project}`, 'QMD returned another index');
+    const source = `.agent/knowledge/${decodeURIComponent(url.pathname.slice(1))}`;
     // Pinned extractSnippet prepends a diff-style location header, not source.
-    const text = r.snippet.replace(/^@@ -\d+,\d+ @@[^\n]*\n/, '');
-    return mapExcerpt(source, text, sources.get(`${project}/${source}`));
+    let text = r.snippet.replace(/^@@ -\d+,\d+ @@[^\n]*\n/, '');
+    const body = sources.get(`${project}/${source}`);
+    // Stock query JSON clips to 300 UTF-16 units, appending three periods.
+    // Keep genuine source ellipses (and ambiguous full matches) intact.
+    if (text.length === 300 && text.endsWith('...') && !body?.includes(text))
+      text = text.slice(0, -3);
+    return mapExcerpt(source, text, body);
   });
 }
 export function score(question: Question, excerpts: Excerpt[], failed: boolean) {

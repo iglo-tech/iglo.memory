@@ -212,3 +212,57 @@ test('deadline also kills descendants that inherit capture pipes', async () => {
   expect(r.timedOut).toBe(true);
   expect(r.elapsedMs).toBeLessThan(2000);
 });
+
+test('QMD source URLs strip only their pinned index decoration', async () => {
+  const { qmdExcerpts } = await import('@/scripts/retrieval-eval/scoring');
+  const sources = new Map([[`p/${source}`, 'aa bb']]);
+  expect(
+    qmdExcerpts(
+      [{ file: 'qmd://p/a.md?index=p', snippet: '@@ -1,1 @@ (0 before, 0 after)\naa' }],
+      'p',
+      sources,
+    )[0],
+  ).toMatchObject({ source, start: 0, end: 2, mapping: 'exact' });
+  expect(() =>
+    qmdExcerpts([{ file: 'qmd://p/a.md?index=other', snippet: 'aa' }], 'p', sources),
+  ).toThrow('index');
+});
+test('QMD execution requires both isolated storage paths and drops model overrides', async () => {
+  const { qmdProcessEnvironment } = await import('@/scripts/retrieval-eval/cli');
+  for (const value of [
+    undefined,
+    {},
+    { XDG_CACHE_HOME: '/cache' },
+    { XDG_CACHE_HOME: '/cache', XDG_CONFIG_HOME: 'relative' },
+  ])
+    expect(() => qmdProcessEnvironment(value)).toThrow();
+  const env = qmdProcessEnvironment({ XDG_CACHE_HOME: '/cache', XDG_CONFIG_HOME: '/config' });
+  expect(env.XDG_CACHE_HOME).toBe('/cache');
+  expect(env.XDG_CONFIG_HOME).toBe('/config');
+  expect(Object.keys(env).sort()).toEqual([
+    'LANG',
+    'LC_ALL',
+    'PATH',
+    'XDG_CACHE_HOME',
+    'XDG_CONFIG_HOME',
+  ]);
+});
+
+test('stock QMD clipping maps presented prefix without swallowing source ellipses', async () => {
+  const { qmdExcerpts } = await import('@/scripts/retrieval-eval/scoring');
+  const body = 'start ' + 'a'.repeat(400);
+  const result = qmdExcerpts(
+    [{ file: 'qmd://p/a.md?index=p', snippet: '@@ -1,1 @@\n' + body.slice(0, 297) + '...' }],
+    'p',
+    new Map([[`p/${source}`, body]]),
+  )[0];
+  expect(result).toMatchObject({ start: 0, end: 297, mapping: 'exact' });
+  const natural = 'start ' + 'a'.repeat(291) + '...';
+  expect(
+    qmdExcerpts(
+      [{ file: 'qmd://p/a.md?index=p', snippet: '@@ -1,1 @@\n' + natural }],
+      'p',
+      new Map([[`p/${source}`, natural]]),
+    )[0]?.end,
+  ).toBe(300);
+});

@@ -97,7 +97,8 @@ Run config extends the development config with `system` (`baseline` or `qmd`),
 `commit`, absolute `executable`, its `executableHash`, `preparationEvidence` path,
 `output` directory, `repetitions`, `timeoutMs`, `regime: "new-process"` and a nonempty
 `cacheFacts` description. For QMD also provide `qmdEnvironment` with the two XDG
-paths. Baseline snapshot hashes are part of the run identity. QMD model/index/stage
+absolute paths. Shell model/index overrides and credentials are not inherited by
+QMD. Its effective PATH/locale/storage environment is hashed into the run. Baseline snapshot hashes are part of the run identity. QMD model/index/stage
 facts must be retained in preparation evidence; this checkpoint does not certify them.
 
 ```sh
@@ -122,7 +123,8 @@ in each specified regime after label and smoke gates pass.
 
 Returned excerpts are separate from candidate full text. Exact unique substring
 matches map to code-point coordinates. The baseline adapter removes only its known
-400-code-point clipping ellipsis; QMD removes only its known location header.
+400-code-point clipping ellipsis; QMD removes its known location header and index URL parameter, plus the stock
+300-UTF-16-unit clipping suffix when it is absent from the original source.
 Repeated text, changed whitespace and unmatched snippets need adjudication. Unknown
 or shorter evidence is not guessed irrelevant or useful: query metrics stay null
 until adjudicated. All returned novel top-eight evidence needs blinded pooling.

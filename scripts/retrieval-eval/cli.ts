@@ -1,4 +1,4 @@
-import { resolve, join } from 'node:path';
+import { resolve, join, isAbsolute } from 'node:path';
 import { cpus, totalmem, platform, arch } from 'node:os';
 import {
   check,
@@ -12,6 +12,24 @@ import {
 import { validateLabels } from '@/scripts/retrieval-eval/labels';
 import { capture, runUnit, publishOnce } from '@/scripts/retrieval-eval/records';
 import { baselineExcerpts, qmdExcerpts, score } from '@/scripts/retrieval-eval/scoring';
+
+export function qmdProcessEnvironment(value: unknown): Record<string, string | undefined> {
+  const settings = object(value);
+  check(
+    Object.keys(settings).length === 2 &&
+      ['XDG_CACHE_HOME', 'XDG_CONFIG_HOME'].every(
+        (key) => typeof settings[key] === 'string' && isAbsolute(settings[key] as string),
+      ),
+    'QMD requires absolute XDG_CACHE_HOME and XDG_CONFIG_HOME',
+  );
+  // Do not inherit model/index overrides or credentials from the invoking shell.
+  return {
+    PATH: process.env.PATH,
+    LANG: process.env.LANG,
+    LC_ALL: process.env.LC_ALL,
+    ...settings,
+  } as Record<string, string | undefined>;
+}
 
 export async function main(args: string[]) {
   const [command, configPath] = args;
@@ -93,19 +111,15 @@ export async function main(args: string[]) {
         ).bytes(),
       );
   }
-  const qmdEnvironment = object(config.qmdEnvironment ?? {});
-  check(
-    Object.entries(qmdEnvironment).every(
-      ([k, v]) => ['XDG_CACHE_HOME', 'XDG_CONFIG_HOME'].includes(k) && typeof v === 'string',
-    ),
-    'Invalid QMD environment',
-  );
+  const qmdEnvironment =
+    config.system === 'qmd' ? qmdProcessEnvironment(config.qmdEnvironment) : undefined;
   const inputs = {
     version: 1,
     config,
     corpusHash: hash(manifestBytes),
     labelsHash: hash(labelBytes),
     preparationHash,
+    qmdEnvironment,
     snapshots,
     harnessHash: hash(
       (
@@ -141,10 +155,7 @@ export async function main(args: string[]) {
             ];
       const cwd = resolve(config.corpusRoot, question.project);
       const result = await runUnit(config.output, inputs, unit, (identity) =>
-        capture(cmd, cwd, identity, unit, config.timeoutMs as number, {
-          ...process.env,
-          ...(qmdEnvironment as Record<string, string>),
-        }),
+        capture(cmd, cwd, identity, unit, config.timeoutMs as number, qmdEnvironment),
       );
       let failure = result.exitCode !== 0 || result.timedOut,
         excerpts: ReturnType<typeof baselineExcerpts> = [];
