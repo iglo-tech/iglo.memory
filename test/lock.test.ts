@@ -10,9 +10,16 @@ test('bounded contention, different directory independence, kill recovery and no
   const other = fixture();
   const config = join(other, 'trusted.toml');
   writeFileSync(config, '');
-  const script = `import {withIndexLock} from ${JSON.stringify(resolve('src/lock.ts'))}; await withIndexLock(${JSON.stringify(root)},async()=>{console.log('LOCKED');await Bun.sleep(60000);});`;
+  const script = `import {withIndexLock} from '@/src/lock'; await withIndexLock(${JSON.stringify(root)},async()=>{console.log('LOCKED');await Bun.sleep(60000);});`;
   const process = Bun.spawn(
-    [globalThis.process.execPath, '--no-env-file', `--config=${config}`, '-e', script],
+    [
+      globalThis.process.execPath,
+      '--no-env-file',
+      `--config=${config}`,
+      `--tsconfig-override=${resolve('tsconfig.json')}`,
+      '-e',
+      script,
+    ],
     { stdout: 'pipe', stderr: 'pipe' },
   );
   try {

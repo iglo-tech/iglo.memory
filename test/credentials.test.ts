@@ -8,7 +8,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { saveCredential, resolveCredential } from '@/src/credentials';
 import { cleanup, cli, fixture, repository } from '@/test/helpers';
 afterEach(cleanup);
@@ -88,7 +88,6 @@ test('real init JSON, saved reuse across repositories, preservation and noninter
 test('concurrent successful saves leave one complete value and last completed save wins', async () => {
   const home = fixture();
   saveCredential('initial', home);
-  const module = join(import.meta.dir, '../src/credentials.ts');
   const trusted = join(home, 'trusted.toml');
   writeFileSync(trusted, '');
   const start = (key: string) =>
@@ -97,8 +96,9 @@ test('concurrent successful saves leave one complete value and last completed sa
         process.execPath,
         '--no-env-file',
         `--config=${trusted}`,
+        `--tsconfig-override=${resolve('tsconfig.json')}`,
         '-e',
-        `import {saveCredential} from ${JSON.stringify(module)};for(let i=0;i<500;i++)saveCredential(${JSON.stringify(key)},${JSON.stringify(home)});`,
+        `import {saveCredential} from '@/src/credentials';for(let i=0;i<500;i++)saveCredential(${JSON.stringify(key)},${JSON.stringify(home)});`,
       ],
       { stdout: 'pipe', stderr: 'pipe' },
     );

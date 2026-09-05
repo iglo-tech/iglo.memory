@@ -245,19 +245,28 @@ test('committed populated snapshots work in fresh linked worktrees with concurre
   const originals = [root, linked].map((path) =>
     readFileSync(join(indexPath(path), 'snapshot.json')),
   );
-  const module = resolve('src/search.ts');
   const home = fixture();
   const trusted = join(home, 'trusted.toml');
   writeFileSync(trusted, '');
   const children = [root, linked].map((path) => {
     chmodSync(join(path, '.agent/knowledge'), 0);
-    const script = `import {search} from ${JSON.stringify(module)};console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture')));`;
-    return Bun.spawn([process.execPath, '--no-env-file', `--config=${trusted}`, '-e', script], {
-      cwd: path,
-      env: { ...process.env, HOME: home, OPENROUTER_API_KEY: undefined, PATH: '/nonexistent' },
-      stdout: 'pipe',
-      stderr: 'pipe',
-    });
+    const script = `import {search} from '@/src/search';console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture')));`;
+    return Bun.spawn(
+      [
+        process.execPath,
+        '--no-env-file',
+        `--config=${trusted}`,
+        `--tsconfig-override=${resolve('tsconfig.json')}`,
+        '-e',
+        script,
+      ],
+      {
+        cwd: path,
+        env: { ...process.env, HOME: home, OPENROUTER_API_KEY: undefined, PATH: '/nonexistent' },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
+    );
   });
   try {
     for (const child of children) {
