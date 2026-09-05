@@ -267,7 +267,9 @@ export function scanSources(
       if (entry.isSymbolicLink()) throw new AppError('SOURCE_INVALID');
       if (entry.isDirectory()) scan(next);
       else if (entry.isFile() && entry.name.endsWith('.md')) {
-        const text = new TextDecoder('utf-8', { fatal: true }).decode(readBytes(join(root, next)));
+        const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(
+          readBytes(join(root, next)),
+        );
         const parsed = chunkSource(project, next, text, model);
         sources.push(parsed.document);
         chunks.push(...parsed.chunks);

@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import { mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { sha256 } from '@/src/chunks';
 import { prepare } from '@/src/prepare';
 import { search, status, gc } from '@/src/search';
 import { readSnapshot, parseSnapshot, indexPath } from '@/src/store';
@@ -121,4 +122,25 @@ test('unknown custom models use single-input conservative batches without hidden
   );
   expect(sizes).toEqual([1, 1]);
   expect(readSnapshot(root, custom).profile.model).toBe('custom-model');
+});
+
+test('filesystem preparation preserves a UTF-8 BOM in source coverage and coordinates', async () => {
+  const root = setup();
+  const original = '\uFEFF# Heading\r\nPolish dokument.\r\n';
+  const normalized = original.replace(/\r\n?/g, '\n');
+  await Bun.write(join(root, '.agent/knowledge/bom.md'), original);
+  await prepare(root, config, embed, key);
+  const snapshot = readSnapshot(root, config);
+  const source = snapshot.sources[0]!;
+  const byId = new Map(snapshot.chunks.map((chunk) => [chunk.passageId, chunk]));
+  const restored = source.spans
+    .map((span) => ('passageId' in span ? byId.get(span.passageId)!.text : span.text))
+    .join('');
+  expect(restored).toBe(normalized);
+  expect(source.length).toBe(Array.from(normalized).length);
+  expect(source.sourceHash).toBe('sha256:' + sha256(normalized));
+  expect(source.lineStarts).toEqual([0, 11, 28]);
+  for (const chunk of snapshot.chunks) {
+    expect(Array.from(normalized).slice(chunk.start, chunk.end).join('')).toBe(chunk.text);
+  }
 });
