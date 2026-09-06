@@ -5,3 +5,7 @@ dist/
 # Local task state and execution evidence, not maintained project documentation.
 .ai/work/
 .ai/cezar/
+
+# Pinned inputs acquired for builds and optional benchmark replay.
+/assets/tokenizers/qwen3-embedding/*.json
+/.cache/

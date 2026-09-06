@@ -65,7 +65,8 @@ committed snapshot can also be searched as-is. Each worktree has its own index.
 Concurrent preparation, loading and GC coordinate with a five-second lock wait;
 a stopped process releases its lock through the OS.
 
-`status` reports prepared counts and missing referenced vectors without reading
+`status` reports the snapshot schema, lexical and embedding profiles, prepared
+counts and missing referenced vectors without reading
 sources or calling OpenRouter. Corrupt present data is an error. `gc` requires
 valid metadata and all referenced vectors before deleting anything. It does not
 use Markdown changes to decide which vectors to keep.
@@ -132,8 +133,17 @@ sh scripts/build.sh
 python3 scripts/qa-terminal.py
 ```
 
+Build and check scripts prepare the pinned tokenizer JSON in an ignored local
+cache. The first run downloads about 11.43 MB of tokenizer data from Hugging Face;
+later runs verify the cache and work offline. Downloads are hash-checked before
+publication. The standalone executable embeds this data and never downloads a
+tokenizer at runtime. Before direct `bun test` or source development, run
+`bun run tokenizers` once. Keep the generated cache for offline builds.
+
 On Linux the default header location is `/usr/include/node`; override
-`NODE_INCLUDE_DIR` if needed. Run the resulting `dist/iglo.mem` from your worktree.
+`NODE_INCLUDE_DIR` if needed. Run the resulting `dist/iglo.mem` from your worktree. Distribute it with generated
+`dist/THIRD_PARTY_NOTICES.txt`; see the [license record](docs/third-party.md).
+Builds also need Git and the pinned notice-archive commit available.
 For source development use the absolute path to `scripts/run.sh`. The supported
 launcher and compiled build disable repository dotenv and Bun preload loading.
 Do not use bare `bun src/cli.ts` from an untrusted repository.

@@ -9,6 +9,8 @@
     ".ai/**",
     ".agent/**",
     "PRD.md",
-    "bun.lock"
+    "bun.lock",
+    "assets/tokenizers/**/*.json",
+    ".cache/**"
   ]
 }

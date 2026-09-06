@@ -20,6 +20,12 @@ const messages = {
     'Could not update the index. Check repository permissions and run iglo.mem prepare.',
   SOURCE_INVALID:
     'Could not read the configured Markdown sources. Check their permissions and symlinks.',
+  QUERY_TOO_LARGE:
+    'The complete question exceeds the supported request budget. Use a shorter question.',
+  EXPANSION_FAILED: 'The query expansion request failed. Check OpenRouter connectivity and retry.',
+  RERANK_FAILED:
+    'The reranking request failed. Check the model, input limits and OpenRouter connectivity.',
+  SEARCH_TIMEOUT: 'The search exceeded its total deadline. Retry the operation.',
   EMBEDDING_FAILED:
     'The embedding request failed. Check OPENROUTER_API_KEY or run iglo.mem init --reset-credentials; also check model, provider input limits and connectivity.',
   INDEX_BUSY: 'The index is busy. Retry after the other operation finishes.',
@@ -29,7 +35,13 @@ const messages = {
 export type ErrorCode = keyof typeof messages;
 
 export class AppError extends Error {
-  constructor(readonly code: ErrorCode) {
+  constructor(
+    readonly code: ErrorCode,
+    readonly details?: {
+      stage: 'embedding' | 'rerank' | 'expansion';
+      reason: 'transport' | 'rate_limit' | 'provider' | 'invalid_response' | 'budget';
+    },
+  ) {
     super(messages[code]);
     this.name = 'AppError';
   }
@@ -38,5 +50,11 @@ export class AppError extends Error {
 // Never serialize an arbitrary exception: it may contain paths, input or secrets.
 export function errorResponse(error: unknown) {
   const code = error instanceof AppError ? error.code : 'INTERNAL_ERROR';
-  return { error: { code, message: messages[code] } };
+  return {
+    error: {
+      code,
+      message: messages[code],
+      ...(error instanceof AppError ? error.details : undefined),
+    },
+  };
 }

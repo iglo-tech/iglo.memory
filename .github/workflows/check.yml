@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Install build headers and pinned dependencies
         run: |
           sudo apt-get update
@@ -27,7 +28,7 @@ jobs:
           python3 scripts/qa-terminal.py
           python3 scripts/qa-clean.py
       - name: Package executable with its permissions
-        run: tar -C dist -czf dist/iglo.mem-linux-x64.tar.gz iglo.mem
+        run: tar -C dist -czf dist/iglo.mem-linux-x64.tar.gz iglo.mem THIRD_PARTY_NOTICES.txt
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           path: dist/iglo.mem-linux-x64.tar.gz

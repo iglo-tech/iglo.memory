@@ -6,7 +6,10 @@ import { search, status, gc } from '@/src/search';
 import { readSnapshot, indexPath, parseSnapshot } from '@/src/store';
 import { fixture, repository, cleanup, cli } from '@/test/helpers';
 import type { Config } from '@/src/config';
-const config: Config = { project: 'fixture', embedding: { model: 'test-model' } };
+const config: Config = {
+  project: 'fixture',
+  embedding: { model: 'openai/text-embedding-3-small' },
+};
 function setup() {
   const root = repository();
   mkdirSync(join(root, '.agent/knowledge'), { recursive: true });
@@ -78,13 +81,21 @@ test('prepare/reuse/edit/failure/delete/GC with snapshot-only search and orphan 
       return [[1, 0]];
     },
     () => 'dummy',
+    {
+      expansion: async () => ({ lex: [], vec: [], hyde: [] }),
+      reranking: async (_query, documents) => documents.map((_, index) => ({ index, score: 1 })),
+      minimumScore: 0,
+    },
   );
   expect(result.results[0]!.heading).toBe('Tokens');
   expect(result.results[0]!.snippet).toContain('Renew');
   const collected = await gc(root, config);
   expect(collected.removedVectors).toBe(1);
   expect(collected.retainedVectors).toBe(2);
-  expect((await status(root, config)).documents).toBe(1);
+  const preparedStatus = await status(root, config);
+  expect(preparedStatus.documents).toBe(1);
+  expect(preparedStatus.schemaVersion).toBe(2);
+  expect(preparedStatus.lexicalProfile).toBe('identifier-bm25-v1');
   expect(old.equals(current)).toBe(false);
   // Rebuild from compatible receipts after snapshot loss without another request.
   renameSync(join(root, '.agent/sources-unavailable'), join(root, '.agent/knowledge'));
@@ -250,7 +261,7 @@ test('committed populated snapshots work in fresh linked worktrees with concurre
   writeFileSync(trusted, '');
   const children = [root, linked].map((path) => {
     chmodSync(join(path, '.agent/knowledge'), 0);
-    const script = `import {search} from '@/src/search';console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture')));`;
+    const script = `import {search} from '@/src/search';console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture',{expansion:async()=>({lex:[],vec:[],hyde:[]}),reranking:async(q,docs)=>docs.map((d,index)=>({index,score:1})),minimumScore:0}))); `;
     return Bun.spawn(
       [
         process.execPath,

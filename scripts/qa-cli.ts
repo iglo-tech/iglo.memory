@@ -20,10 +20,24 @@ try {
     preload,
     `const log=Bun.file(${JSON.stringify(log)});
   globalThis.fetch=Object.assign(async(url,init)=>{
+    if(String(url)==='https://openrouter.ai/api/v1/rerank') {
+      const body=JSON.parse(init.body);
+      if(body.query.includes('FAIL_RERANK'))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
+      if(body.top_n!==body.documents.length)throw new Error('incomplete rerank');
+      return Response.json({model:'rerank-2.5',results:body.documents.map((text,index)=>({index,relevance_score:body.query==='unknown answer'?0:text.includes('rotation')?1:0.1,document:{text}})).reverse()});
+    }
+    if(String(url)==='https://openrouter.ai/api/v1/chat/completions') {
+      const body=JSON.parse(init.body);
+      if(body.model!=='openai/gpt-5.6-luna'||body.reasoning.effort!=='low')throw new Error('expansion contract');
+      const query=body.messages[1].content;
+      if(query.includes('FAIL_EXPANSION'))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
+      const content=JSON.stringify(query==='token renewal'?{lex:['token rotation'],vec:['How to renew a token?'],hyde:[]}:{lex:[query],vec:[],hyde:[]});
+      return Response.json({model:body.model,choices:[{index:0,finish_reason:'stop',message:{role:'assistant',content}}]});
+    }
     if(String(url)!=='https://openrouter.ai/api/v1/embeddings')throw new Error('unexpected endpoint');
-    const body=JSON.parse(init.body);await Bun.write(log,(await log.text())+JSON.stringify({model:body.model,inputs:body.input.length,kind:body.input[0].startsWith('Project: ')?'documents':'query'})+'\\n');
+    const body=JSON.parse(init.body);await Bun.write(log,(await log.text())+JSON.stringify({model:body.model,inputs:body.input.length,kind:body.input[0].startsWith('Context: ')?'documents':'query'})+'\\n');
     if(body.input.some(text=>text.includes('FAIL_PROVIDER')))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
-    return Response.json({data:body.input.map((text,index)=>({index,embedding:text.toLowerCase().includes('token')?[1,0,0]:[0,1,0]})).reverse()});
+    return Response.json({data:body.input.map((text,index)=>({index,embedding:Array.from({length:4096},(_,i)=>i===(text.toLowerCase().includes('token')?0:1)?1:0)})).reverse()});
   },{preconnect:()=>{}});`,
   );
   const cli = resolve('src/cli.ts');
@@ -71,8 +85,21 @@ try {
   const query = await run(['search', 'token renewal']);
   if (query.results[0]?.heading !== 'Authentication') throw new Error('ranking');
   if (sha256(await Bun.file(file).bytes()) !== sourceHash) throw new Error('source mutation');
+  await run(['search', 'token version 1.2.3 value -1 timeout:5']);
+  if ((await run(['search', 'unknown answer'])).results.length !== 0) throw new Error('abstention');
+  const rerankFailure = await run(['search', 'FAIL_RERANK token'], false);
+  if (rerankFailure.error?.code !== 'RERANK_FAILED' || rerankFailure.results !== undefined)
+    throw new Error('rerank failure');
   const snapshot = join(root, '.agent/memory-index/snapshot.json');
   const prior = sha256(await Bun.file(snapshot).bytes());
+  const failure = await run(['search', 'FAIL_PROVIDER token'], false);
+  if (failure.error?.code !== 'EMBEDDING_FAILED' || failure.results !== undefined)
+    throw new Error('search failure contract');
+  if (sha256(await Bun.file(snapshot).bytes()) !== prior) throw new Error('search mutation');
+  const expansionFailure = await run(['search', 'FAIL_EXPANSION token'], false);
+  if (expansionFailure.error?.code !== 'EXPANSION_FAILED' || expansionFailure.results !== undefined)
+    throw new Error('expansion failure contract');
+  if (sha256(await Bun.file(snapshot).bytes()) !== prior) throw new Error('expansion mutation');
   await Bun.write(file, '# Authentication\nFAIL_PROVIDER token');
   await run(['prepare'], false);
   if (sha256(await Bun.file(snapshot).bytes()) !== prior) throw new Error('failed publication');
@@ -81,6 +108,8 @@ try {
   if (!stored.results[0]?.snippet.includes('rotation')) throw new Error('source-only search');
   const status = await run(['status']);
   if (status.documents !== 1) throw new Error('freshness changed');
+  if (status.schemaVersion !== 2 || status.lexicalProfile !== 'identifier-bm25-v1')
+    throw new Error('status provenance missing');
   const beforeGc = await run(['gc']);
   if (beforeGc.removedVectors !== 0) throw new Error('active deletion');
   const empty = await run(['prepare']);
@@ -97,6 +126,7 @@ try {
         .trim()
         .split('\n')
         .map((line) => JSON.parse(line)),
+      searchFailureNoPartialResults: 'PASS',
       sourcePreservation: 'PASS',
       failedRefreshPreservation: 'PASS',
       sourceIndependentSearch: 'PASS',
