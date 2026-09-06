@@ -1,0 +1,15 @@
+> September6 final direction: user explicitly approved Luna-low via OpenRouter. Prior alternative selections/blockers below are historical; see docs/specs/retrieval-v2-expansion.md.
+
+# Query-expansion specialist availability — 2026-09-05
+
+Question: find a purpose-trained query-expansion/rewriting model served by OpenRouter, with no local inference/new provider account. User rejects substitutes consisting only of prompted generalist chat models and rejects flagship cost. Result: **no verified compatible model found**. Serving availability blocks selecting a specialist under all current constraints. This is not proof none could exist undocumented.
+
+Checked complete public OpenRouter431model catalog, all ID/description matches for query/rewrite/retrieval/search, and specialist endpoint lookups. Saved catalog `.ai/cezar/runs/retrieval-v2/specialist-openrouter-catalog.json`. Primary https://openrouter.ai/api/v1/models . No dedicatedexpansionmodel identified; relace-search is agentic file/grep search (https://openrouter.ai/relace/relace-search), Perplexity routes perform websearch, CommandR RAG support does not document standaloneexpansionfinetuning. None is a supported substitute for the requested specialist.
+
+Actual specialists investigated:
+- QMD tobil/qmd-query-expansion-1.7B: productionSFT for typedlex/vec/HyDE; publicweights. Training https://github.com/tobi/qmd/blob/main/finetune/README.md . NoORcatalogentry, /api/v1/models/tobil/qmd-query-expansion-1.7b/endpoints returns404. Englishtraining; Polishunverified. Localpath rejectedbyuser, notrecommended.
+- s-emanuilov/query-expansion-Qwen2.5-7B: explicitqueryexpansionfinetune, publicadapterweights, January2025. https://huggingface.co/s-emanuilov/query-expansion-Qwen2.5-7B . NoORentry, correspondingendpoint404. Oldmodel excludedasdeploymentcandidate peruser, usefulonlyasactualspecialistexample.
+- ForwardAILabs/MQR-A1: April2026 card describes Qwen3-4B-based SFT+GRPO using retrievalnDCGreward. https://huggingface.co/ForwardAILabs/MQR-A1 . Advertises66.9BRIGHTshort/56.0long for combinedMQR+MREpipeline, not isolatedrewriter gain or ourQwenstack. HFAPI confirmedrepositoryONLY.gitattributes/README.md, noweightfiles. NoORentry, forwardailabs/mqr-a1/endpoints404. Thus neitheravailabledeploymentnorverifiedwinningbenchmarkclaim.
+- March2026 research https://arxiv.org/html/2603.13776v1 describes retrieval-feedbackdistillation/preferencealignment onEnglishTREC/ChineseMIRACL. Researchmethod evidence, no verifiedORservedcheckpoint; not a deployable candidate recommendation.
+
+PriorAstra/GPT4.1/localQMD recommendations WITHDRAWN. Generalistprobes are historical evidence and do not satisfy specialistrequirement. No morepaidmodelcomparison is authorized merelyto evade that requirement. No inference/download/runtimechanges thispass. Do not change inferenceproviders, train/hostamodel, addlocalruntime, removeexpansion or silentlysubstitutegeneralist. RequiredT04-Eselection currentlyblockedbyverifiedavailability; T04core remainsreviewed, T05–T07unfinished.

@@ -20,6 +20,10 @@ Historical OpenAI/Luna contract evidence is retained, not reused as Qwen limits.
 
 ## next_slice
 
+September6: user approved Luna-low expansion. T04-E model blocker is closed; exact contract and full-query probe passed. Implement typed expansion before T05.
+
+User restored required expansion: [T04-E amendment](retrieval-v2-expansion.md) supersedes the no-action decision. T04 core1bf6c98 passed all three reviews; detail T04-E before T05.
+
 T03 passed verification and all three reviews at ffbb882.
 [T04 protected fusion and deadlines](retrieval-v2-t04.md) is specified before delegation.
 
