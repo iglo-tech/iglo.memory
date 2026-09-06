@@ -149,3 +149,22 @@ not a public benchmark or language-parity claim and does not replace the origina
 Use the current fixed cutoff and stack with a $0.05 ceiling; no QMD or repeat
 measurements. Agent-reviewed exact source evidence and failures join development
 reports separately. Original held-out inputs remain unopened.
+
+### T06-A3 pooled ablation judgments
+
+The completed five-view experiment adds232 distinct source-owned displayed excerpts
+beyond the native324 and proposal187 pool (some of those prior pools overlap).
+Review each new excerpt twice with isolated reviewer contexts and shuffled order;
+omit view, rank, score and model identity. Record grade0/1/2, facets, explicit
+misleading status, minimal exact quote and any sufficient-existing-unit IDs.
+Adjudicate all grade/facet/harm/identity disagreements before shared metrics.
+Preserve protocol limitations: earlier proposal reviews inherited orchestration
+context and retained result order despite omitting scores/model names. They were
+independent judgments, not a strictly blinded experiment. The stricter displayed
+review finds19/26 useful questions versus the earlier23/26 snippet assessment;
+keep both records and use the common displayed protocol for comparisons.
+
+No new inference is needed for this slice. Root owns canonical evidence mapping
+and metric integration; two agents own read-only source judgments in run storage.
+The implementation remains unchanged until the comparison identifies a concrete
+issue. Numeric gates and original held-out access remain downstream.

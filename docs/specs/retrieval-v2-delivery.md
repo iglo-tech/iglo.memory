@@ -20,7 +20,7 @@ Historical OpenAI/Luna contract evidence is retained, not reused as Qwen limits.
 
 ## next_slice
 
-T04-E passed verification and all three reviews at 915d610. [T05 reranking and excerpts](retrieval-v2-t05.md) is detailed before delegation.
+T05 passed verification and all three reviews at115768c. [T06 comparative evaluation](retrieval-v2-t06.md) is active: saved-output replay reviewed, bilingual and controlled ablation runs complete, common displayed evidence judgments next.
 
 User restored required expansion: [T04-E amendment](retrieval-v2-expansion.md) supersedes the no-action decision. T04 core1bf6c98 passed all three reviews; detail T04-E before T05.
 
@@ -35,8 +35,8 @@ T03 passed verification and all three reviews at ffbb882.
 | RV2-T02 | Complete/reviewed   | T02-Q and T02-R close revised F07–F11/G01/G02; prior evidence retained        |
 | RV2-T03 | Complete/reviewed   | Detail AC01–05/09: source coverage, schema-2, reuse, BM25 and vector CLI      |
 | RV2-T04 | Complete/reviewed   | Detail AC06/10: protected fusion/deadline; R09 expansion experiment decision  |
-| RV2-T05 | Ready; detailed     | Detail AC07–10: dedicated rerank, abstention and precise diverse evidence     |
-| RV2-T06 | Blocked on T01–T05  | AC11–12: bilingual development supplement, ablations and frozen quality gates |
+| RV2-T05 | Complete/reviewed   | Detail AC07–10: dedicated rerank, abstention and precise diverse evidence     |
+| RV2-T06 | Active development  | AC11–12: bilingual development supplement, ablations and frozen quality gates |
 | RV2-T07 | Blocked on T06 pass | AC01/09/12: release/migration and actual-dimension performance proof          |
 
 ## dependencies
