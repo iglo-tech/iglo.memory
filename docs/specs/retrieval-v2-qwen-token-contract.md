@@ -18,13 +18,23 @@ Use `@huggingface/tokenizers` **0.1.3** (Apache-2.0), a pure JavaScript tokenize
 with no dependencies. Bundle Qwen's `tokenizer.json` and `tokenizer_config.json`
 from revision `1d8ad4ca9b3dd8059ad90a75d4983776a23d44af`. Static JSON imports work
 in a standalone Bun executable. Preserve both upstream licenses when integrating.
-The assets are about 11.43 MB, not embedding model weights.
+The upstream assets are about 11.43 MB. The bundled compact JSON is about 5.37 MB;
+parsed data is identical. These are not embedding model weights.
 
-Asset SHA-256 values:
+Upstream asset SHA-256 values (before whitespace-only compaction):
 
 - `tokenizer.json`: `83cdf8c3a34f68862319cb1810ee7b1e2c0a44e0864ae930194ddb76bb7feb8d`
 - `tokenizer_config.json`: `2f58f4bbd7bbce15d683f525954ef3a92cd82f5e06415a9c513859bf8ab72436`
 - Qwen `LICENSE`: `832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e`
+
+Bundled compact JSON SHA-256 values:
+
+- `tokenizer.json`: `662967645e3e0c65b1ce2109ed8fa6c758dbd468bcd0661c66fcce212e17a795`
+- `tokenizer_config.json`: `7f5d7c2892962c40495871da2b893f899b69a10d0322abc71e59c19cd0c62deb`
+
+Reproduce compaction with `JSON.stringify(JSON.parse(upstreamText)) + "\n"`.
+The complete parsed objects are unchanged; static imports and offline counting
+remain the same. Formatting excludes these generated vocabulary files.
 
 Count the complete input with `encode(text, {add_special_tokens: true}).ids.length`.
 Qwen's tokenizer normalizes to NFC and appends one `endoftext` token. Omitting the

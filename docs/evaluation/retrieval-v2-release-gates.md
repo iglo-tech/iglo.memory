@@ -1,10 +1,14 @@
 # Retrieval v2 release freeze
 
-The adjacent `retrieval-v2-freeze.json` is the immutable execution manifest for
-one original held-out comparison. Commit and hash it before opening the reviewed
-80-question envelope or its 50 held-out questions. Its absolute paths identify
-this evaluation workspace; a fresh reproduction must reconstruct the bound
-artifacts and publish its own manifest, not pretend these paths are portable.
+The original execution manifest was committed before held-out access at
+`5c17ebc2ac58a3357fd063aece16763560a6e8a6`, path
+`docs/evaluation/retrieval-v2-freeze.json`, SHA-256
+`5a3e358f20b1aebcf4cf2a0abdc96d54273f9e4f21939d193af288eb4115d2cb`.
+It contains machine-specific run paths and is retained in evaluation storage and
+Git history, rather than maintained in the source tree. Recover the exact bytes
+with `git show 5c17ebc:docs/evaluation/retrieval-v2-freeze.json`. A fresh run must
+reconstruct its artifacts and create a new manifest; these paths are not portable.
+The historical manifest and acceptance values were not rewritten during cleanup.
 
 Production uses Qwen3-Embedding-8B (4096 dimensions), prepared BM25, Luna-low
 query expansion and Voyage rerank-2.5 through OpenRouter. The score cutoff is
