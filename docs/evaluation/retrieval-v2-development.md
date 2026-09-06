@@ -1,6 +1,6 @@
 # Retrieval v2 development results
 
-This is development evidence, not release acceptance. The original50 held-out questions remain unopened. The approved stack is Qwen3-Embedding-8B, prepared BM25, Luna-low typed expansion and Voyage rerank-2.5 through OpenRouter. No product model runs locally.
+This is development evidence, not release acceptance. The held-out questions were unopened when these measurements were made; see [the final report](retrieval-v2-heldout.md) for subsequent outcomes. The approved stack is Qwen3-Embedding-8B, prepared BM25, Luna-low typed expansion and Voyage rerank-2.5 through OpenRouter. No product model runs locally.
 
 The full stack improves early ranking and rejects the four unsupported development questions. It returns sufficient displayed evidence within eight results for19/26 answerable questions, versus17/26 for the pinned baseline and9/26 for stock full QMD. The paired95% interval for the baseline useful@8 difference still crosses zero, so these development results do not establish a reliable baseline improvement.
 
@@ -36,4 +36,4 @@ The bilingual supplement uses three authored Polish documents and eight separate
 
 Use the frozen corpus mapping, reviewed source coordinates and explicit observation identities, not current upstream documentation. `scripts/retrieval-eval/proposal.ts` validates source-owned results and replays saved transport. `ablations.ts` constructs shared-input variants. `common.ts` validates canonical judgments and scores all views without inference. Their focused fixtures and `sh scripts/check.sh` cover exact spans, duplicate/partial evidence, failures and immutable contracts.
 
-The complete development report retains per-project/slice counts, query means, fixed-seed paired intervals and win/tie/loss, raw observation hashes and the separate recovery cohort in Cezar task evidence as `common-development-report.json`. The174-unit identity ledger hash is `0f4ce5262e539fcb3c7de38fc5d2aa9b8fd432372fcb6c98779143f499903d07`. Original findings, corrections, source packets and observations remain available there. Final benchmark artifacts and locked release outcomes follow the held-out evaluation.
+The complete development report retains per-project/slice counts, query means, fixed-seed paired intervals and win/tie/loss, raw observation hashes and the separate recovery cohort in Cezar task evidence as `common-development-report.json`. The174-unit identity ledger hash is `0f4ce5262e539fcb3c7de38fc5d2aa9b8fd432372fcb6c98779143f499903d07`. Original findings, corrections, source packets and observations remain available there. Final benchmark artifacts and locked release outcomes are in [the replay bundle](retrieval-v2-final/README.md).

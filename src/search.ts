@@ -269,7 +269,7 @@ export async function search(
       { deadline },
     );
     // Development-selected cutoff; scores are not calibrated probabilities.
-    // See docs/specs/retrieval-v2-t05.md for sensitivity and rollout limits.
+    // See docs/retrieval-v2-design.md for sensitivity and rollout limits.
     const minimumScore = options.minimumScore ?? 0.435546875;
     const results = scores
       .filter(({ score }) => score >= minimumScore)

@@ -1,13 +1,11 @@
-# Retrieval v2 evaluation foundation
+# Retrieval evaluation
 
-The completed comparison is in [the held-out report](retrieval-v2-heldout.md).
-The original release decision is `NO_ROLLOUT`; supplemental results remain
-a separate diagnostic. Earlier sections below retain their implementation-stage
-context and are not the final release status.
-
-This is a partial T01/T02 implementation. It does not pass their exit gates or
-change production retrieval. Use the [foundation protocol](../specs/retrieval-v2-foundation.md)
-for the complete benchmark. Reports deliberately remain `INCOMPLETE`.
+Start with [held-out results](retrieval-v2-heldout.md) and the
+[offline replay bundle](retrieval-v2-final/README.md). The original release
+decision is `NO_ROLLOUT`; supplemental quality results do not replace it.
+[Development comparisons](retrieval-v2-development.md) explain calibration,
+expansion ablations and limited bilingual coverage. [Frozen release gates](retrieval-v2-release-gates.md)
+record the acceptance values chosen before held-out access.
 
 ## Corpus and reproduction
 
@@ -49,188 +47,62 @@ The destination must not exist. All committed blobs and notices are checked befo
 writing. Partial destinations are retained for diagnosis; choose a new empty path.
 Do not modify the frozen sources for reuse experiments: use another materialization.
 
-## Labels and custody
+## Labels and immutable observations
 
-The `Labels`/`Question`/`Evidence` types in `scripts/retrieval-eval/labels.ts` define
-the version-1 JSON. Spans use zero-based LF-normalized Unicode code points, end
-exclusive. Grade 2 is direct evidence; grade 1 is supporting; grade 0 is irrelevant.
-Evidence units are unique source spans, with facet IDs and reasons. Preserve initial
-labels separately from subsequent revisions. Questions carry family, project,
-answerability, reason, primary/secondary slices and split.
+The published benchmark has 80 reviewed questions, split 30 development / 50
+held-out. Question families stay in one split. Two independent agent reviews and
+explicit adjudication replace manual review under the user's instruction.
+Grades are 0 for no answer support, 1 for partial support and 2 for directly useful
+evidence. Answerability, supported facets and misleading output are separate.
+Topical background on an unsupported question does not become positive answer
+evidence. Preserve disagreements and corrections rather than changing the
+question contract after observing results.
 
-Development JSON must contain exactly 30 questions with the specified 8/6/4/4/4/4
-allocation. `validateLabels(..., 'complete')` additionally validates all 80 and the
-50 held-out allocation. Only the evaluator may use that function on held-out inputs.
-The CLI always rejects held-out records. It does not generate held-out questions.
-Two distinct review records and an adjudication reference are required to record
-reviewed status. Per the [agent evaluation amendment](../specs/retrieval-v2-agent-evaluation.md),
-reviewers may be agents or humans; `kind` preserves that provenance. Schema checks
-cannot prove the work was performed. The evaluator inspects the ledger and keeps
-held-out custody until the T06 freeze.
+Native captures are hash-bound to corpus, questions, executable/model inputs and
+cache regime. Failures and interrupted claims remain recorded; changed inputs
+require a new run. A failed request's unknown usage never becomes zero merely
+because a retry succeeds. The original eight proposal searches and 42 evaluator
+skips remain separate from the supplemental 42 actual searches.
 
-Drafts and reviewer identities belong outside Git. The eventual reviewed benchmark
-is published only after held-out evaluation. Add `labels` to the config above and run:
+## Common evidence metrics
 
-```sh
-bun scripts/retrieval-eval/cli.ts validate /evaluation/development.json
-```
+`common.ts` validates canonical source units, legacy bindings and exact displayed
+renderings. Each unit has a question-local ID, minimal source span, target grade,
+facets and explicit proposition. Shifted windows expressing the same proposition
+at the same locus share a unit; distinct source loci remain separate. Bundled
+excerpts can credit multiple units. Identity needs semantic review, not automatic
+merging by coordinate overlap.
 
-## Native process observations
+Renderings retain displayed grade, facets, misleading judgment and exact supporting
+quote. Per-unit achieved grades cannot exceed targets. An explicitly reviewed
+shorter quote can support a unit without widening its displayed span. Validate
+source ownership, Unicode code-point coordinates, frozen hashes and known IDs.
+Unknown renderings remain unresolved, not automatically irrelevant.
 
-Build the unmodified baseline at `9670f625661e46935ec1523bb70c6dd8b35d48e4` using its
-`scripts/build.sh`. For each materialized project, initialize a disposable Git repo,
-write `.agent/memory.json` with that project ID and the default embedding model,
-then run the pinned executable's `prepare` twice. Keep stdout/stderr, timing, exit
-codes, binary hash and preparation/reuse summaries outside Git. Live preparation
-uses the existing shared credential and consumes API credit.
+Useful@1/3/5/8 means at least one grade-2 displayed excerpt, independent of novelty.
+Facet recall unions supported facets. Pooled span recall counts each unit once
+when achieved grade reaches its target; it is not exhaustive corpus recall.
+`unit-novelty-ndcg-v1` uses gains 0/1/3: each rank gains the maximum positive
+increase among credited units, then updates all their achieved gains. The ideal
+is the first eight sorted unit target gains. Partial then direct support therefore
+contributes 1 then 2, while duplicates contribute nothing new. This convention
+can penalize bundled evidence relative to separate ideal units; it is not standard
+document nDCG. All compared systems share the same reviewed unit pool.
 
-For stock QMD, checkout `dbfd0b4736aeaf761d1a16ca8e424f071df8feb9`, install its pinned
-lockfile dependencies with Bun, and use its stock `bin/qmd`. Record runtime/build
-hashes and hardware. Set `XDG_CACHE_HOME` and `XDG_CONFIG_HOME` to evaluation storage.
-Run `qmd pull`, record SHA-256 for all three default GGUF files, then for each project:
+Failed answerable searches score zero with failure retained. Failed unsupported
+searches are not successful abstentions. Comparisons average repetitions per
+question, use paired question bootstrap intervals and retain missing counts.
+The final replay pins the frozen seed, 2000 samples and 95% intervals.
 
-```sh
-qmd --index PROJECT collection add /evaluation/corpus/PROJECT/.agent/knowledge --name PROJECT
-qmd --index PROJECT embed
-qmd --index PROJECT status
-qmd --index PROJECT query 'original question' --json --explain -n 8
-```
-
-Never replace `query` with `search`, disable reranking, change models or count an
-index without vectors as full QMD. Capture stock traces and disclose bypasses.
-Successful exit alone does not certify the comparator. Model-cold/novel-warm/cache
-warm evidence still needs the full foundation protocol and evaluator inspection.
-
-Run config extends the development config with `system` (`baseline` or `qmd`),
-`commit`, absolute `executable`, its `executableHash`, `preparationEvidence` path,
-`output` directory, `repetitions`, `timeoutMs`, `regime: "new-process"` and a nonempty
-`cacheFacts` description. For QMD also provide `qmdEnvironment` with the two XDG
-absolute paths. Shell model/index overrides and credentials are not inherited by
-QMD. Its effective PATH/locale/storage environment is hashed into the run. Baseline snapshot hashes are part of the run identity. QMD model/index/stage
-facts must be retained in preparation evidence; this checkpoint does not certify them.
+## Maintenance checks
 
 ```sh
-bun scripts/retrieval-eval/cli.ts run /evaluation/run.json
+bun test test/retrieval-publication.test.ts test/retrieval-common.test.ts
+bun scripts/retrieval-eval/replay-publication.ts docs/evaluation/retrieval-v2-final /evaluation/corpus
 ```
 
-Each run identity hashes exact config, corpus/labels bytes, preparation evidence,
-baseline snapshots, evaluator source, runtime and hardware. Each observation is
-published exclusively via a completed temporary file. Existing failures resume as
-failures. A malformed record stops the run and remains on disk. A crash may leave
-an exclusive `.claim`: confirm the original process has stopped, preserve the claim
-as evidence, then remove it to resume. Explicit reruns use a new config attempt ID.
-No observation is silently overwritten or retried to improve a score.
-
-The native `cli.ts run` harness measures new CLI processes. It does not infer
-model or provider cache state from process lifetime. Whole-process elapsed time is
-measured; unavailable stages, retries and usage remain null with reasons.
-Separate finite QMD adapter experiments exercise warm models and persistent caches
-through the same pinned stock retrieval functions. Their API timing excludes
-startup and priming and must never be merged with whole-CLI timings. The development
-runs provide three repetitions per question; the separate project pilots diagnose
-cache regimes without claiming all-question, whole-CLI latency in every regime.
-See the completed [cache-regime diagnostic](cache-regimes.md) for measurements,
-reproduction boundaries and artifact identities.
-
-## Scoring and limitations
-
-Returned excerpts are separate from candidate full text. Exact unique substring
-matches map to code-point coordinates. The baseline adapter removes only its known
-400-code-point clipping ellipsis; QMD removes its known location header and index URL parameter, plus the stock
-300-UTF-16-unit clipping suffix when it is absent from the original source.
-Repeated text, changed whitespace and unmatched snippets need adjudication. Unknown
-or shorter evidence is not guessed irrelevant or useful: query metrics stay null
-until adjudicated. All returned novel top-eight evidence needs blinded pooling.
-
-For each ranked result the highest newly covered unit grade supplies the gain
-(0/1/3). Units covered by an earlier result cannot gain again. Ideal DCG sorts the
-query's judged units; incomplete pooling can change it and must be recorded. Span
-recall counts unique positive units, facet recall their union. Useful presence is
-reported at 1/3/5/8, with supporting presence separate. Answerable errors contribute
-zero usefulness/nDCG; unanswerable errors are failures with null abstention metrics.
-Misleading rate needs explicit reviewer judgment, even for exact source text.
-
-`pairedBootstrap` accepts paired query means, uses fixed-seed resampling and returns
-95% percentile intervals plus win/tie/loss. The per-system CLI report includes per-project/slice counts, query means,
-explicit eligible/scored/missing denominators, unanswerable success/failure and
-judgment denominators, and nearest-rank whole-process p50/p95/max. Missing or
-unjudged repetitions invalidate a query mean; they are never silently dropped.
-The separate observed unanswerable rates use successful calls, with failures and
-unjudged harm counts alongside them. At least three complete repetitions are
-needed to mark the timing sample representative.
-
-`report.ts::compare` computes paired metrics from query means. Callers must first
-check matching corpus/label hashes and cache regimes; differing systems are the
-intended comparison, differing inputs are not. The pure summary/comparison functions
-have hand-calculated fixtures. Join two saved native runs with:
-
-```sh
-bun scripts/retrieval-eval/join.ts /evaluation/join.json
-```
-
-The JSON config supplies absolute `manifest`, `corpusRoot`, `labels`, `firstRun`,
-`secondRun` and `output` paths. Run directories must be their original hash names.
-The join verifies frozen corpus/labels, comparator pins, repetition counts and
-matching cache descriptions, then recalculates scores from raw observations.
-Missing units remain explicit; changed or corrupt records are never repaired.
-Joined artifacts include raw-record hashes and publish without overwriting prior
-reports. Matching descriptions still require inspection of actual cache/stage
-evidence. Blinded adjudication imports and returned-window reconstruction are
-implemented and exercised; see the [development checkpoint](development-checkpoint.md).
-That diagnostic keeps complete prepared chunks and QMD selected windows separate
-from displayed excerpts and discloses model-input truncation limits. It does not
-measure recall of the top-40 candidate pool; that diagnostic belongs to T04/T06.
-Preparation-edit experiments retain separate evidence. F06 requires review of the
-completed foundation evidence and reproduction packet, not a release decision.
-Held-out and QMD-relative release gates remain T06 work.
-
-## T02 contract fixtures
-
-`chat-contract.ts` contains the exact D04/D06 prompts, Luna-low parameters, JSON
-schemas and local validators. Remote schemas keep array bounds and ID enums local
-until the route is probed. Empty arrays succeed; extra properties, lost literals,
-unknown/duplicate IDs, refusal, tools and truncation fail. Requests keep complete
-candidate bodies and the original question in JSON data. Ordinary title-case words
-are not treated as mixed-case identifiers.
-
-The evaluation-only transport checks a total deadline and ten-second attempts,
-retries network/429/5xx at most once, respects Retry-After and emits bounded errors.
-It is not wired into production. Local fixtures do not prove semantic fidelity,
-provider capacity, exact token budgeting, custom-model sizing or bundled tokenizer
-assets. G01/G02 stay open until the complete measured protocol establishes them.
-
-```sh
-bun test test/retrieval-eval.test.ts test/retrieval-chat.test.ts
-sh scripts/check.sh
-```
-
-## Importing pooled judgments
-
-The optional `adjudication` path in a join config loads the version-1 contract in
-[the adjudication slice](../specs/retrieval-v2-agent-evaluation.md#t01-pooled-adjudication-slice).
-It contains `corpusHash`, `labelsHash`, reviewed `labels`, and `mappings`. Labels
-preserve the original question contract and evidence, adding newly reviewed units.
-Mappings contain `question`, `source`, exact presented `text`, code-point `start`
-and `end` (both null if unresolved), `misleading` (boolean or null), and `reason`.
-Review identities retain agent/human provenance. The two original hashes bind the
-native run inputs; the separate adjudication hash binds the revised scoring view.
-
-The join rejects changed question semantics, lost original evidence, duplicate
-mappings and coordinates that do not reproduce the exact excerpt. It rescales no
-raw score and rewrites no captured response: source evidence is scored again with
-the reviewed additions. Missing judgments remain unknown. An explicit misleading
-judgment can be recorded even when source-coordinate ambiguity remains unresolved.
-
-## Token-budget helpers
-
-`token-budget.ts` contains offline cl100k embedding counts, serialized o200k chat
-counts, deterministic digest-bearing context previews and lossless wrapped source
-ranges. See the [token contract](../specs/retrieval-v2-token-contract.md). These are
-evaluation helpers pending production integration. Chat counts describe serialized
-text; provider-added framing is measured separately. No unknown model silently
-inherits a claimed exact tokenizer.
-
-js-tiktoken 1.0.21 is pinned in the lockfile; its package git revision is
-`4c8b748e07992c00386f3180af5c574b27b65139`. MIT notices for it and base64-js are in
-`licenses/`. Exact rank hashes and the isolated executable proof are recorded in
-[the token-budget research](../../.ai/research/retrieval-v2-token-budget.md).
+The replay requires only local materialized sources. It makes no inference calls.
+Run `sh scripts/check.sh` for changed evaluation code. Do not repeat provider or
+QMD runs for documentation edits. Frozen native stdout, machine bindings and
+run logs stay outside tracked files; published data and hashes support offline
+metric reproduction, not independent authentication of omitted provider responses.
