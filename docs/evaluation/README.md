@@ -1,5 +1,10 @@
 # Retrieval v2 evaluation foundation
 
+The completed comparison is in [the held-out report](retrieval-v2-heldout.md).
+The original release decision is `NO_ROLLOUT`; supplemental results remain
+a separate diagnostic. Earlier sections below retain their implementation-stage
+context and are not the final release status.
+
 This is a partial T01/T02 implementation. It does not pass their exit gates or
 change production retrieval. Use the [foundation protocol](../specs/retrieval-v2-foundation.md)
 for the complete benchmark. Reports deliberately remain `INCOMPLETE`.
@@ -12,7 +17,8 @@ and all nine uv project-concept documents. Whole directories provide distractors
 without selecting for observed retrieval wins. Fastify Server.md supplies a natural
 long document. The collections include tables, fences, API names and error codes.
 Path mapping is `.agent/knowledge/<original path>` within separate project roots;
-the manifest itself is the reverse map. No source content or models are committed.
+the manifest itself is the reverse map. No complete source corpus or models are committed. The final benchmark bundle
+contains only reviewed evidence excerpts.
 
 The manifest records immutable upstream commits, original byte hashes and hashes
 of UTF-8 text after CRLF/CR normalization to LF. Invalid UTF-8 is rejected. Upstream

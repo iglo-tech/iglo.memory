@@ -10,6 +10,7 @@
     ".agent/**",
     "PRD.md",
     "bun.lock",
-    "assets/tokenizers/**/*.json"
+    "assets/tokenizers/**/*.json",
+    "docs/evaluation/retrieval-v2-final/*.json"
   ]
 }
