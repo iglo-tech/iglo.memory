@@ -108,6 +108,8 @@ try {
   if (!stored.results[0]?.snippet.includes('rotation')) throw new Error('source-only search');
   const status = await run(['status']);
   if (status.documents !== 1) throw new Error('freshness changed');
+  if (status.schemaVersion !== 2 || status.lexicalProfile !== 'identifier-bm25-v1')
+    throw new Error('status provenance missing');
   const beforeGc = await run(['gc']);
   if (beforeGc.removedVectors !== 0) throw new Error('active deletion');
   const empty = await run(['prepare']);

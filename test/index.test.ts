@@ -92,7 +92,10 @@ test('prepare/reuse/edit/failure/delete/GC with snapshot-only search and orphan 
   const collected = await gc(root, config);
   expect(collected.removedVectors).toBe(1);
   expect(collected.retainedVectors).toBe(2);
-  expect((await status(root, config)).documents).toBe(1);
+  const preparedStatus = await status(root, config);
+  expect(preparedStatus.documents).toBe(1);
+  expect(preparedStatus.schemaVersion).toBe(2);
+  expect(preparedStatus.lexicalProfile).toBe('identifier-bm25-v1');
   expect(old.equals(current)).toBe(false);
   // Rebuild from compatible receipts after snapshot loss without another request.
   renameSync(join(root, '.agent/sources-unavailable'), join(root, '.agent/knowledge'));

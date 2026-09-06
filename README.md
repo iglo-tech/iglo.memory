@@ -65,7 +65,8 @@ committed snapshot can also be searched as-is. Each worktree has its own index.
 Concurrent preparation, loading and GC coordinate with a five-second lock wait;
 a stopped process releases its lock through the OS.
 
-`status` reports prepared counts and missing referenced vectors without reading
+`status` reports the snapshot schema, lexical and embedding profiles, prepared
+counts and missing referenced vectors without reading
 sources or calling OpenRouter. Corrupt present data is an error. `gc` requires
 valid metadata and all referenced vectors before deleting anything. It does not
 use Markdown changes to decide which vectors to keep.

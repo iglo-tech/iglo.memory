@@ -311,6 +311,8 @@ export async function status(root: string, config: Config) {
       chunks: snapshot.chunks.length,
       vectors: loaded.vectors.size,
       missingVectors: loaded.missingVectors,
+      schemaVersion: snapshot.schemaVersion,
+      lexicalProfile: snapshot.lexical.profile,
       profile: snapshot.profile.profile,
     };
   });
