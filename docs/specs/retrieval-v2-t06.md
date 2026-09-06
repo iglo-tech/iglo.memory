@@ -259,3 +259,27 @@ no real held-out reads, inference, QMD launches or commits while implementing it
 Use synthetic tests for pre-read freeze/hash rejection, default custody rejection,
 complete split selection, identical resume, failed observation retention and
 explicit held-out scorer admission. Production CLI surface remains unchanged.
+
+### Frozen QMD content with mutable query caches
+
+QMD full query writes its llm_cache table. Binding live SQLite bytes would make a
+legitimate resume fail or encourage wiping caches. Retain one immutable seed of
+each existing project database and create a separate persistent runtime copy once,
+including the existing caches. Bind seed bytes, configuration and the runtime
+validator/launcher in the release manifest. Never overwrite a runtime copy or
+clear caches on resume. Existing model files and configuration stay in place.
+
+Before and after each stock query, compare runtime schema and every non-cache
+physical table against the seed's logical fingerprint. Include FTS/vector shadow
+tables and sqlite_sequence; exclude only llm_cache rows, not its schema. Read a
+consistent SQLite snapshot including WAL, not raw main-file bytes when WAL exists.
+A content mismatch fails explicitly. Use stock QMD with the frozen --index name and
+its supported INDEX_PATH pointing at the runtime copy. This is evaluation-only
+storage isolation, with identical corpus/models/query behavior and retained caches.
+
+The wrapper forwards stock stdout/stderr and exit status, uses Bun.spawn in the
+parent process group, and performs no retries. Root prepares/binds immutable seeds
+and launch configuration; runtime worker owns qmd-runtime.ts and focused synthetic
+SQLite tests. Prove cache-only writes/resume succeed and changed documents/vector
+shadow/schema or unknown preexisting runtime data fail. No model/QMD launch or
+original held-out access during implementation.
