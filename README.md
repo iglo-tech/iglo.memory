@@ -141,7 +141,9 @@ tokenizer at runtime. Before direct `bun test` or source development, run
 `bun run tokenizers` once. Keep the generated cache for offline builds.
 
 On Linux the default header location is `/usr/include/node`; override
-`NODE_INCLUDE_DIR` if needed. Run the resulting `dist/iglo.mem` from your worktree.
+`NODE_INCLUDE_DIR` if needed. Run the resulting `dist/iglo.mem` from your worktree. Distribute it with generated
+`dist/THIRD_PARTY_NOTICES.txt`; see the [license record](docs/third-party.md).
+Builds also need Git and the pinned notice-archive commit available.
 For source development use the absolute path to `scripts/run.sh`. The supported
 launcher and compiled build disable repository dotenv and Bun preload loading.
 Do not use bare `bun src/cli.ts` from an untrusted repository.

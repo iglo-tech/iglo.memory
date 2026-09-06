@@ -7,3 +7,4 @@ cd "$root"
 npx --yes bun@1.4.2 --no-env-file --no-install --config="$config" scripts/tokenizer-assets.ts
 sh scripts/native.sh
 npx --yes bun@1.4.2 --no-env-file --no-install --config="$config" build --compile --no-compile-autoload-dotenv --no-compile-autoload-bunfig src/cli.ts --outfile dist/iglo.mem
+npx --yes bun@1.4.2 --no-env-file --no-install --config="$config" scripts/third-party-notices.ts

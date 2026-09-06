@@ -20,7 +20,8 @@ contains only reviewed evidence excerpts.
 
 The manifest records immutable upstream commits, original byte hashes and hashes
 of UTF-8 text after CRLF/CR normalization to LF. Invalid UTF-8 is rejected. Upstream
-license files are retained under `licenses/`. The iglo.mem comparator pin has no
+license files are checked and copied into the materialized corpus directory.
+See [the license record](../third-party.md). The iglo.mem comparator pin has no
 license file; its user-owned material is used locally and must not be redistributed
 as an externally licensed corpus. No source acquisition changes this status.
 

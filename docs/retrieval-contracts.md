@@ -90,8 +90,8 @@ admission also enforces the embedding and Voyage limits.
 
 Builds download hash-pinned tokenizer JSON into ignored local assets and compact it with
 `JSON.stringify(JSON.parse(upstreamText)) + "\n"`; complete parsed objects are
-unchanged. Static imports support standalone offline counting. Keep licenses in
-`assets/tokenizers/`; tokenizer data is not inference weights.
+unchanged. Static imports support standalone offline counting. Distribute the generated notices described in
+[the license record](third-party.md); tokenizer data is not inference weights.
 
 Upstream asset SHA-256 values (before whitespace-only compaction):
 
