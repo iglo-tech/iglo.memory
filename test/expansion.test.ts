@@ -224,3 +224,15 @@ test('maximal quantities preserve versions, signs and dates without overlapping 
     ).toThrow();
   }
 });
+
+test('sentence punctuation never hides changed or omitted quantities', () => {
+  for (const literal of ['5', '-1', '1.2.3', '25%'])
+    for (const punctuation of ['.', ':', ',']) {
+      const query = `Keep ${literal}${punctuation}`;
+      expect(parseExpansion(body({ lex: [query], vec: [], hyde: [] }), query)).toEqual(empty());
+      for (const replacement of ['Keep the value', 'Keep 6.'])
+        expect(() =>
+          parseExpansion(body({ lex: [replacement], vec: [], hyde: [] }), query),
+        ).toThrow();
+    }
+});

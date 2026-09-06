@@ -58,11 +58,11 @@ export function expansionRequest(query: string) {
 // Protect recognizable code and quantities, not ordinary title-cased prose.
 function anchors(text: string): Set<string> {
   const result = new Set<string>();
-  for (const match of text.matchAll(/`([^`]+)`/gu)) result.add(match[1]!);
-  for (const match of text.matchAll(
-    /(?<![\p{L}\p{N}_./:@+-])[+-]?\d+(?:[.,:-]\d+)*%?(?![\p{L}\p{N}_./:@+-])/gu,
-  ))
-    result.add(match[0]);
+  const literalRanges: { start: number; end: number }[] = [];
+  for (const match of text.matchAll(/`([^`]+)`/gu)) {
+    result.add(match[1]!);
+    literalRanges.push({ start: match.index, end: match.index + match[0].length });
+  }
   for (const match of text.matchAll(/[\p{L}\p{N}_./:@-]+/gu)) {
     const token = match[0].replace(/[.:]+$/u, '');
     if (
@@ -72,8 +72,22 @@ function anchors(text: string): Set<string> {
       /[\p{L}\p{N}]\.[\p{L}\p{N}]/u.test(token) ||
       /\p{Ll}\p{Lu}/u.test(token) ||
       /\p{Lu}{2}\p{Ll}/u.test(token)
-    )
+    ) {
       result.add(token);
+      literalRanges.push({ start: match.index, end: match.index + match[0].length });
+    }
+  }
+  // Code literals already protect embedded numbers. Outside those spans, keep
+  // maximal signed quantities without treating sentence punctuation as identity.
+  for (const match of text.matchAll(
+    /(?<![\p{L}\p{N}_])[+-]?\d+(?:[.,:-]\d+)*%?(?![\p{L}\p{N}_])/gu,
+  )) {
+    if (
+      !literalRanges.some(
+        ({ start, end }) => match.index >= start && match.index + match[0].length <= end,
+      )
+    )
+      result.add(match[0]);
   }
   return result;
 }
@@ -82,10 +96,10 @@ function containsLiteral(text: string, literal: string): boolean {
   while ((start = text.indexOf(literal, start)) !== -1) {
     const before = Array.from(text.slice(0, start)).at(-1) ?? '';
     const after = Array.from(text.slice(start + literal.length))[0] ?? '';
-    const joinedDot =
-      (before === '.' && /[\p{L}\p{N}_]/u.test(text[start - 2] ?? '')) ||
-      (after === '.' && /[\p{L}\p{N}_]/u.test(text[start + literal.length + 1] ?? ''));
-    if (!joinedDot && !/[\p{L}\p{N}_/:@-]/u.test(before) && !/[\p{L}\p{N}_/:@-]/u.test(after))
+    const joinedPunctuation =
+      (/[.:]/u.test(before) && /[\p{L}\p{N}_]/u.test(text[start - 2] ?? '')) ||
+      (/[.:]/u.test(after) && /[\p{L}\p{N}_]/u.test(text[start + literal.length + 1] ?? ''));
+    if (!joinedPunctuation && !/[\p{L}\p{N}_/@-]/u.test(before) && !/[\p{L}\p{N}_/@-]/u.test(after))
       return true;
     start++;
   }
