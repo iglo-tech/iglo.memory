@@ -229,3 +229,122 @@ test('search embedding validates shape once and preserves prepare retry behavior
   expect(calls).toBe(4);
   expect(vectors).toEqual([[1, 0]]);
 });
+
+test('caller cancellation settles stalled fetch and body without a second request', async () => {
+  for (const stalled of ['fetch', 'body']) {
+    const controller = new AbortController();
+    let calls = 0;
+    let signal: AbortSignal | undefined;
+    let cancelled = false;
+    const started = performance.now();
+    const result = requestSearchJson(
+      'https://test.invalid',
+      {},
+      { ...options(), signal: controller.signal, code: 'EXPANSION_FAILED' },
+      request(async (_, init) => {
+        calls++;
+        signal = init!.signal!;
+        if (stalled === 'fetch') return new Promise<Response>(() => {});
+        return new Response(
+          new ReadableStream({
+            cancel() {
+              cancelled = true;
+            },
+          }),
+        );
+      }),
+    );
+    await Bun.sleep(10);
+    controller.abort(new Error('PRIVATE_CAUSE'));
+    await expect(result).rejects.toMatchObject({
+      code: 'EXPANSION_FAILED',
+      details: { stage: 'expansion', reason: 'transport' },
+    });
+    expect(performance.now() - started).toBeLessThan(1000);
+    expect(calls).toBe(1);
+    expect(signal!.aborted).toBe(true);
+    if (stalled === 'body') expect(cancelled).toBe(true);
+  }
+});
+
+test('caller cancellation interrupts default and uncooperative injected retry waits', async () => {
+  for (const injected of [false, true]) {
+    const controller = new AbortController();
+    let calls = 0;
+    const result = requestSearchJson(
+      'https://test.invalid',
+      {},
+      { ...options(), signal: controller.signal },
+      request(async () => {
+        calls++;
+        return new Response('', { status: 429, headers: { 'Retry-After': '9' } });
+      }),
+      injected ? async () => new Promise(() => {}) : undefined,
+    );
+    await Bun.sleep(10);
+    controller.abort();
+    await expect(result).rejects.toMatchObject({
+      code: 'EMBEDDING_FAILED',
+      details: { reason: 'transport' },
+    });
+    expect(calls).toBe(1);
+  }
+});
+
+test('pre-aborted embedding makes no request and an expired deadline wins over cancellation', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  let calls = 0;
+  const fetcher = request(async () => {
+    calls++;
+    return Response.json({});
+  });
+  await expect(
+    embed(['a'], 'model', 'key', 2, fetcher, undefined, {
+      deadline: performance.now() + 30_000,
+      signal: controller.signal,
+    }),
+  ).rejects.toMatchObject({ code: 'EMBEDDING_FAILED', details: { reason: 'transport' } });
+  await expect(
+    requestSearchJson(
+      'https://test.invalid',
+      {},
+      {
+        ...options(),
+        deadline: performance.now() - 1,
+        signal: controller.signal,
+      },
+      fetcher,
+    ),
+  ).rejects.toMatchObject({ code: 'SEARCH_TIMEOUT' });
+  expect(calls).toBe(0);
+});
+
+test('cancelled default retry timer does not keep a CLI process alive', async () => {
+  const child = Bun.spawn(
+    [
+      process.execPath,
+      '-e',
+      `
+    import { requestSearchJson } from '@/src/search-transport';
+    const controller = new AbortController();
+    const request = async () => new Response('', { status: 429, headers: { 'Retry-After': '9' } });
+    const pending = requestSearchJson('https://test.invalid', {}, {
+      deadline: performance.now() + 30000, maxBytes: 1024,
+      code: 'EMBEDDING_FAILED', signal: controller.signal,
+    }, request);
+    setTimeout(() => controller.abort(), 20);
+    try { await pending; process.exitCode = 1; }
+    catch (error) { process.exitCode = error.code === 'EMBEDDING_FAILED' ? 0 : 2; }
+  `,
+    ],
+    { cwd: process.cwd(), stdout: 'pipe', stderr: 'pipe' },
+  );
+  const timeout = setTimeout(() => child.kill(), 2000);
+  try {
+    expect(await child.exited).toBe(0);
+  } finally {
+    clearTimeout(timeout);
+    child.kill();
+  }
+});

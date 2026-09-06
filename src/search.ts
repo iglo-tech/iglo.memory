@@ -1,6 +1,7 @@
 import { AppError } from '@/src/errors';
 import type { Config } from '@/src/config';
 import { embed } from '@/src/embedding';
+import { expand } from '@/src/expansion';
 import { budgetFor } from '@/src/token-budget';
 import { scoreLexical } from '@/src/lexical';
 import type { StoredChunk } from '@/src/store';
@@ -21,16 +22,15 @@ export function comparePassages(a: StoredChunk, b: StoredChunk) {
     Buffer.compare(Buffer.from(a.passageId), Buffer.from(b.passageId))
   );
 }
-export function originalCandidates(
+type Candidate = { chunk: StoredChunk; score: number };
+function vectorCandidates(
   snapshot: Snapshot,
   vectors: ReadonlyMap<string, ArrayLike<number>>,
-  query: string,
   queryVector: number[],
   vectorNorms?: ReadonlyMap<string, number>,
-) {
-  const byId = new Map(snapshot.chunks.map((chunk) => [chunk.passageId, chunk]));
+): Candidate[] {
   const queryNorm = norm(queryVector);
-  const vector = snapshot.chunks
+  return snapshot.chunks
     .map((chunk) => {
       const values = vectors.get(chunk.vector)!;
       let dot = 0;
@@ -39,18 +39,43 @@ export function originalCandidates(
     })
     .sort((a, b) => b.score - a.score || comparePassages(a.chunk, b.chunk))
     .slice(0, 40);
-  const lexical = scoreLexical(snapshot.lexical, query)
+}
+function lexicalCandidates(
+  snapshot: Snapshot,
+  byId: ReadonlyMap<string, StoredChunk>,
+  query: string,
+): Candidate[] {
+  return scoreLexical(snapshot.lexical, query)
     .map((item) => ({ chunk: byId.get(item.passageId)!, score: item.score }))
     .sort((a, b) => b.score - a.score || comparePassages(a.chunk, b.chunk))
     .slice(0, 40);
-  return { vector, lexical };
 }
-type Candidate = { chunk: StoredChunk; score: number };
-export function fuseCandidates(lists: { vector: Candidate[]; lexical: Candidate[] }): Candidate[] {
+export function originalCandidates(
+  snapshot: Snapshot,
+  vectors: ReadonlyMap<string, ArrayLike<number>>,
+  query: string,
+  queryVector: number[],
+  vectorNorms?: ReadonlyMap<string, number>,
+) {
+  const byId = new Map(snapshot.chunks.map((chunk) => [chunk.passageId, chunk]));
+  return {
+    vector: vectorCandidates(snapshot, vectors, queryVector, vectorNorms),
+    lexical: lexicalCandidates(snapshot, byId, query),
+  };
+}
+export function fuseCandidates(
+  lists: { vector: Candidate[]; lexical: Candidate[] },
+  expanded: Candidate[][] = [],
+): Candidate[] {
   const scores = new Map<string, Candidate>();
   const protectedIds = new Set<string>();
   const key = (chunk: StoredChunk) => JSON.stringify([chunk.source, chunk.start, chunk.end]);
-  for (const list of [lists.vector, lists.lexical]) {
+  const channels = [
+    { candidates: lists.vector, original: true },
+    { candidates: lists.lexical, original: true },
+    ...expanded.map((candidates) => ({ candidates, original: false })),
+  ];
+  for (const { candidates: list, original } of channels) {
     const seen = new Set<string>();
     let rank = 0;
     for (const { chunk } of list) {
@@ -59,9 +84,9 @@ export function fuseCandidates(lists: { vector: Candidate[]; lexical: Candidate[
       seen.add(id);
       rank++;
       if (rank > 40) break;
-      if (rank <= 8) protectedIds.add(id);
+      if (original && rank <= 8) protectedIds.add(id);
       const current = scores.get(id) ?? { chunk, score: 0 };
-      current.score += 1 / (60 + rank);
+      current.score += (original ? 2 : 1) / (60 + rank);
       scores.set(id, current);
     }
   }
@@ -100,19 +125,20 @@ export function rank(
   vectorNorms?: ReadonlyMap<string, number>,
 ) {
   const lists = originalCandidates(snapshot, vectors, query, queryVector, vectorNorms);
-  return fuseCandidates(lists)
-    .slice(0, 8)
-    .map(({ chunk }, index) => ({
-      score: Math.round((1 / (index + 1)) * 1e6) / 1e6,
-      passageId: chunk.passageId,
-      source: chunk.source,
-      heading: chunk.heading,
-      startLine: chunk.startLine,
-      endLine: chunk.endLine,
-      snippet:
-        Array.from(chunk.text).slice(0, 400).join('') +
-        (Array.from(chunk.text).length > 400 ? '…' : ''),
-    }));
+  return presentCandidates(fuseCandidates(lists));
+}
+function presentCandidates(candidates: Candidate[]) {
+  return candidates.slice(0, 8).map(({ chunk }, index) => ({
+    score: Math.round((1 / (index + 1)) * 1e6) / 1e6,
+    passageId: chunk.passageId,
+    source: chunk.source,
+    heading: chunk.heading,
+    startLine: chunk.startLine,
+    endLine: chunk.endLine,
+    snippet:
+      Array.from(chunk.text).slice(0, 400).join('') +
+      (Array.from(chunk.text).length > 400 ? '…' : ''),
+  }));
 }
 export async function search(
   root: string,
@@ -120,7 +146,7 @@ export async function search(
   query: string,
   embedding = embed,
   credential = requireCredential,
-  options: { deadline?: number } = {},
+  options: { deadline?: number; expansion?: typeof expand } = {},
 ) {
   const deadline = options.deadline ?? performance.now() + 30_000;
   try {
@@ -145,7 +171,7 @@ export async function search(
         preparedAt: snapshot.preparedAt,
         responseVersion: 2,
         scoreKind: 'ordinal',
-        retrievalRevision: 'original-hybrid-v2',
+        retrievalRevision: 'typed-expansion-v2',
         results: [],
       };
     const budget = budgetFor(config.embedding.model);
@@ -154,23 +180,84 @@ export async function search(
     checkSearchDeadline(deadline);
     const key = credential();
     checkSearchDeadline(deadline);
-    const [queryVector] = await embedding(
-      [input],
-      config.embedding.model,
-      key,
-      snapshot.profile.dimensions!,
-      undefined,
-      undefined,
-      { deadline },
+    const controller = new AbortController();
+    const transport = { deadline, signal: controller.signal };
+    let firstFailure: { error: unknown } | undefined;
+    const observe = async <T>(operation: () => Promise<T>): Promise<T> => {
+      try {
+        return await operation();
+      } catch (error) {
+        firstFailure ??= { error };
+        controller.abort();
+        throw error;
+      }
+    };
+    const original = observe(() =>
+      embedding(
+        [input],
+        config.embedding.model,
+        key,
+        snapshot.profile.dimensions!,
+        undefined,
+        undefined,
+        transport,
+      ),
     );
+    const generated = observe(async () => {
+      const expansion = await (options.expansion ?? expand)(query, key, transport);
+      checkSearchDeadline(deadline);
+      const inputs = [
+        ...expansion.vec.map((variant) => budget.formatQuery(variant)),
+        ...expansion.hyde,
+      ];
+      const generatedVectors: number[][] = [];
+      for (const batch of budget.batches(inputs)) {
+        checkSearchDeadline(deadline);
+        if (controller.signal.aborted)
+          throw new AppError('EMBEDDING_FAILED', {
+            stage: 'embedding',
+            reason: 'transport',
+          });
+        generatedVectors.push(
+          ...(await embedding(
+            batch,
+            config.embedding.model,
+            key,
+            snapshot.profile.dimensions!,
+            undefined,
+            undefined,
+            transport,
+          )),
+        );
+      }
+      return { expansion, generatedVectors };
+    });
+    await Promise.allSettled([original, generated]);
     checkSearchDeadline(deadline);
-    const results = rank(snapshot, vectors, query, queryVector!, norms);
+    if (firstFailure) throw firstFailure.error;
+    const [queryVector] = await original;
+    const { expansion, generatedVectors } = await generated;
+    const byId = new Map(snapshot.chunks.map((chunk) => [chunk.passageId, chunk]));
+    const lists = {
+      vector: vectorCandidates(snapshot, vectors, queryVector!, norms),
+      lexical: lexicalCandidates(snapshot, byId, query),
+    };
+    const expanded: Candidate[][] = [];
+    for (const variant of expansion.lex) {
+      checkSearchDeadline(deadline);
+      expanded.push(lexicalCandidates(snapshot, byId, variant));
+    }
+    for (const vector of generatedVectors) {
+      checkSearchDeadline(deadline);
+      expanded.push(vectorCandidates(snapshot, vectors, vector, norms));
+    }
+    const results = presentCandidates(fuseCandidates(lists, expanded));
     checkSearchDeadline(deadline);
     return {
       query,
       responseVersion: 2,
       scoreKind: 'ordinal',
-      retrievalRevision: 'original-hybrid-v2',
+      retrievalRevision: 'typed-expansion-v2',
       preparedAt: snapshot.preparedAt,
       results,
     };

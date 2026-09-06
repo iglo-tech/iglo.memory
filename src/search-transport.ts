@@ -3,7 +3,8 @@ import { AppError } from '@/src/errors';
 export type SearchTransportOptions = {
   deadline: number;
   maxBytes: number;
-  code: 'EMBEDDING_FAILED' | 'RERANK_FAILED';
+  code: 'EMBEDDING_FAILED' | 'RERANK_FAILED' | 'EXPANSION_FAILED';
+  signal?: AbortSignal;
 };
 type Reason = 'transport' | 'rate_limit' | 'provider' | 'invalid_response' | 'budget';
 
@@ -30,24 +31,34 @@ export async function requestSearchJson(
   init: RequestInit,
   options: SearchTransportOptions,
   request: typeof fetch = fetch,
-  sleep: (ms: number) => Promise<unknown> = (ms) => Bun.sleep(ms),
+  sleep?: (ms: number) => Promise<unknown>,
 ): Promise<unknown> {
-  const { deadline, maxBytes, code } = options;
+  const { deadline, maxBytes, code, signal } = options;
   const failure = (reason: Reason) =>
     new AppError(code, {
-      stage: code === 'EMBEDDING_FAILED' ? 'embedding' : 'rerank',
+      stage:
+        code === 'EMBEDDING_FAILED'
+          ? 'embedding'
+          : code === 'EXPANSION_FAILED'
+            ? 'expansion'
+            : 'rerank',
       reason,
     });
-  checkDeadline(deadline);
+  const checkActive = () => {
+    checkDeadline(deadline);
+    if (signal?.aborted) throw failure('transport');
+  };
+  checkActive();
   if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) throw failure('budget');
   for (let attempt = 0; attempt < 2; attempt++) {
-    checkDeadline(deadline);
+    checkActive();
     const controller = new AbortController();
     let response: Response | undefined;
     let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let reason: Reason = 'transport';
     let delay = 250;
+    let onAbort: (() => void) | undefined;
     try {
       const work = async () => {
         response = await request(url, { ...init, redirect: 'error', signal: controller.signal });
@@ -79,7 +90,7 @@ export async function requestSearchJson(
             parts.push(part.value);
           }
         }
-        checkDeadline(deadline);
+        checkActive();
         const bytes = new Uint8Array(length);
         let offset = 0;
         for (const part of parts) {
@@ -92,7 +103,7 @@ export async function requestSearchJson(
         } catch {
           throw failure('invalid_response');
         }
-        checkDeadline(deadline);
+        checkActive();
         return { retry: false as const, value };
       };
       const timeout = new Promise<never>((_, reject) => {
@@ -104,25 +115,46 @@ export async function requestSearchJson(
           Math.ceil(Math.min(10_000, deadline - performance.now())),
         );
       });
-      const result = await Promise.race([work(), timeout]);
-      checkDeadline(deadline);
+      const aborted = new Promise<never>((_, reject) => {
+        onAbort = () => {
+          controller.abort();
+          reject(failure('transport'));
+        };
+        signal?.addEventListener('abort', onAbort, { once: true });
+        if (signal?.aborted) onAbort();
+      });
+      checkActive();
+      const result = await Promise.race([work(), timeout, aborted]);
+      checkActive();
       if (!result.retry) return result.value;
     } catch (error) {
-      checkDeadline(deadline);
+      checkActive();
       if (error instanceof AppError) throw error;
       reason = 'transport';
     } finally {
       clearTimeout(timer);
+      if (onAbort) signal?.removeEventListener('abort', onAbort);
       controller.abort();
       if (reader) void reader.cancel().catch(() => {});
       else if (response) cancel(response.body);
     }
-    checkDeadline(deadline);
+    checkActive();
     if (attempt === 1 || delay >= deadline - performance.now()) throw failure(reason);
     let delayTimer: ReturnType<typeof setTimeout> | undefined;
+    let sleepTimer: ReturnType<typeof setTimeout> | undefined;
+    let onDelayAbort: (() => void) | undefined;
     try {
       await Promise.race([
-        sleep(delay),
+        sleep
+          ? sleep(delay)
+          : new Promise<void>((resolve) => {
+              sleepTimer = setTimeout(resolve, delay);
+            }),
+        new Promise<never>((_, reject) => {
+          onDelayAbort = () => reject(failure('transport'));
+          signal?.addEventListener('abort', onDelayAbort, { once: true });
+          if (signal?.aborted) onDelayAbort();
+        }),
         new Promise<never>((_, reject) => {
           delayTimer = setTimeout(
             () => reject(new AppError('SEARCH_TIMEOUT')),
@@ -131,11 +163,13 @@ export async function requestSearchJson(
         }),
       ]);
     } catch (error) {
-      checkDeadline(deadline);
+      checkActive();
       if (error instanceof AppError) throw error;
       throw failure('transport');
     } finally {
       clearTimeout(delayTimer);
+      clearTimeout(sleepTimer);
+      if (onDelayAbort) signal?.removeEventListener('abort', onDelayAbort);
     }
   }
   throw failure('transport');

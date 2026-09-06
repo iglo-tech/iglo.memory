@@ -22,6 +22,7 @@ const messages = {
     'Could not read the configured Markdown sources. Check their permissions and symlinks.',
   QUERY_TOO_LARGE:
     'The complete question exceeds the supported request budget. Use a shorter question.',
+  EXPANSION_FAILED: 'The query expansion request failed. Check OpenRouter connectivity and retry.',
   RERANK_FAILED:
     'The reranking request failed. Check the model, input limits and OpenRouter connectivity.',
   SEARCH_TIMEOUT: 'The search exceeded its total deadline. Retry the operation.',
@@ -37,7 +38,7 @@ export class AppError extends Error {
   constructor(
     readonly code: ErrorCode,
     readonly details?: {
-      stage: 'embedding' | 'rerank';
+      stage: 'embedding' | 'rerank' | 'expansion';
       reason: 'transport' | 'rate_limit' | 'provider' | 'invalid_response' | 'budget';
     },
   ) {

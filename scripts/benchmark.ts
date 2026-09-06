@@ -114,6 +114,7 @@ try {
         'refresh token',
         async () => [vector],
         () => 'fixture',
+        { expansion: async () => ({ lex: [], vec: [], hyde: [] }) },
       );
     }
     JSON.stringify(result);

@@ -32,8 +32,8 @@ export async function embed(
   key: string,
   dimensions?: number,
   request: typeof fetch = fetch,
-  sleep: (ms: number) => Promise<unknown> = (ms) => Bun.sleep(ms),
-  options?: { deadline: number },
+  sleep?: (ms: number) => Promise<unknown>,
+  options?: { deadline: number; signal?: AbortSignal },
 ): Promise<number[][]> {
   if (options) {
     const body = await requestSearchJson(
@@ -100,7 +100,7 @@ export async function embed(
       return parseEmbeddings(body, inputs.length, dimensions);
     }
     if (attempt === 3 || delay >= deadline - performance.now()) break;
-    await sleep(delay);
+    await (sleep ? sleep(delay) : Bun.sleep(delay));
   }
   throw new AppError('EMBEDDING_FAILED');
 }

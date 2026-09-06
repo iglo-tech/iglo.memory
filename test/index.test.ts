@@ -81,6 +81,7 @@ test('prepare/reuse/edit/failure/delete/GC with snapshot-only search and orphan 
       return [[1, 0]];
     },
     () => 'dummy',
+    { expansion: async () => ({ lex: [], vec: [], hyde: [] }) },
   );
   expect(result.results[0]!.heading).toBe('Tokens');
   expect(result.results[0]!.snippet).toContain('Renew');
@@ -253,7 +254,7 @@ test('committed populated snapshots work in fresh linked worktrees with concurre
   writeFileSync(trusted, '');
   const children = [root, linked].map((path) => {
     chmodSync(join(path, '.agent/knowledge'), 0);
-    const script = `import {search} from '@/src/search';console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture')));`;
+    const script = `import {search} from '@/src/search';console.log(JSON.stringify(await search(${JSON.stringify(path)},${JSON.stringify(config)},'prepared passage',async()=>[[1,0]],()=> 'fixture',{expansion:async()=>({lex:[],vec:[],hyde:[]})}))); `;
     return Bun.spawn(
       [
         process.execPath,
