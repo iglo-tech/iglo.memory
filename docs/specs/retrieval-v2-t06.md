@@ -123,3 +123,29 @@ The first common-review packet contains 187 current-cutoff proposal snippets;
 native 324-excerpt judgments remain the reviewed starting point. Subsequent
 bilingual/ablation outputs enter the same pool when available. This is an incremental
 development pool, not a complete-corpus recall oracle.
+
+### Controlled ablation and bilingual details
+
+Controlled development uses the existing602 v2 passages, identical stored Qwen
+vectors and the exact saved original-query vectors. Expanded variants reuse saved
+Luna strings and generated vectors. All views use current source-owned excerpt
+presentation so retrieval effects are not confused with a changed snippet rule.
+Compare: pinned baseline weighting/threshold/file-dedup adapted to shared inputs;
+original BM25+vector protected fusion; expanded protected fusion; complete expanded
+reranking; and complete reranking with expansion disabled. Label the adapted
+baseline separately from native baseline. Original-only reranking may require one
+new complete-candidate Voyage call per question, with no new embeddings/expansion.
+Declare a $0.05 ceiling for those at most30 calls, save full observations/failures,
+and make no QMD calls or timing repetitions. Unsupported score reuse across
+different rerank candidate requests is forbidden. Hash and verify all shared inputs.
+Ablation worker owns evaluation-only ablation module/tests and ignored driver;
+root owns comparison/pooling. No production behavior changes in this experiment.
+
+The separate bilingual supplement has three authored Polish documents and eight
+questions: Polish inflection/paraphrase, English over Polish, Polish over pinned
+English sources, literal preservation and an unsupported password question. It is
+not a public benchmark or language-parity claim and does not replace the original
+80 questions. Review source sufficiency and natural Polish before inference.
+Use the current fixed cutoff and stack with a $0.05 ceiling; no QMD or repeat
+measurements. Agent-reviewed exact source evidence and failures join development
+reports separately. Original held-out inputs remain unopened.
