@@ -212,3 +212,14 @@ bundled facets, mismatched source/quote/hash, unknown rows and no-answer failure
 Evaluation worker owns common.ts and its focused tests. Root owns sidecar
 construction, semantic identity adjudication, integration and reports. No product
 changes, inference, QMD or original held-out access in this slice.
+
+### Pre-freeze R15 correction
+
+The development audit found that status omits schemaVersion and lexicalProfile,
+required by parent D08/R15. Close this existing requirement before freezing the
+retrieval candidate: add the loaded snapshot schemaVersion and lexical profile
+string to status JSON, retaining existing counts, embedding profile and strict
+corruption/missing-vector behavior. No source reads or inference. Reproduce with
+status over a prepared fixture, assert both fields, and prove the controlled CLI
+flow plus configured checks before independent reviews. This reopens only the
+missing T03 status detail; it does not start conditional T07 rollout.
