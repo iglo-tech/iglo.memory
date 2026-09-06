@@ -168,3 +168,47 @@ No new inference is needed for this slice. Root owns canonical evidence mapping
 and metric integration; two agents own read-only source judgments in run storage.
 The implementation remains unchanged until the comparison identifies a concrete
 issue. Numeric gates and original held-out access remain downstream.
+
+### T06-A4 common canonical metric contract
+
+The completed excerpt reviews are sufficient for useful-presence diagnostics.
+Common span recall and graded ranking also need reviewed evidence identity: the
+native positive pool has overlapping windows and bundled facets. Coordinates
+alone must not merge them. Preserve original labels and native judgments intact;
+add a source-owned canonical sidecar with units, legacy bindings and exact
+displayed renderings. Each positive unit has a stable question-local ID, source,
+minimal span, target grade1/2, facets and explicit proposition. Source occurrences
+at distinct nonoverlapping loci remain separate span units; facet recall measures
+their shared answer content. Overlapping shifted windows expressing the same
+proposition share a unit; bundled evidence may map to multiple units. Independent
+identity review must approve aliases and grade1 partial versus grade2 direct
+renderings. Unknown identities remain unresolved, never default to irrelevant.
+
+Renderings retain immutable displayed grade, facets, misleading judgment and
+exact supporting quote. Per-unit credits state achieved grade, bounded by unit
+target. Sufficient shorter quotes can cover a unit through explicit reviewed
+credit without widening the displayed coordinates. Validate source ownership,
+exact Unicode quote/span reproduction, known unit/facet IDs, no contradictory
+duplicate rendering, and frozen input hashes before scoring. No system-specific
+unit denominators or one positive unit per result.
+
+Useful@1/3/5/8 uses direct displayed grade2, independent of novelty. Facet recall
+unions explicitly supported rendering facets. Pooled canonical span recall counts
+a unit once when achieved grade reaches its target. Retain historical native
+metrics separately. Version common graded ranking as unit-novelty nDCG: gains
+0/1/3, rank gain is the maximum positive increase over previously achieved gain
+for its credited units; update all unit credits after each result. Ideal gain is
+the sorted unit target gains, first8. This makes partial then direct evidence
+contribute1 then2, and prevents duplicate credit. Disclose that the one-maximum
+gain-per-result convention can penalize bundled evidence relative to separate
+ideal units; this is not conventional document nDCG or complete-corpus recall.
+All compared views use exactly the same pool and protocol.
+
+Missing rendering/identity leaves common metrics unresolved. Empty/failed
+answerable observations score zero with failure retained; failed no-answer
+observations are not successful abstentions. Repetition means remain per query.
+Tests cover sufficient-shorter credit, duplicate units, partial-to-direct gain,
+bundled facets, mismatched source/quote/hash, unknown rows and no-answer failures.
+Evaluation worker owns common.ts and its focused tests. Root owns sidecar
+construction, semantic identity adjudication, integration and reports. No product
+changes, inference, QMD or original held-out access in this slice.
