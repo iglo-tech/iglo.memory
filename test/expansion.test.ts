@@ -236,3 +236,29 @@ test('sentence punctuation never hides changed or omitted quantities', () => {
         ).toThrow();
     }
 });
+
+test('colon-qualified literals preserve exact originals and namespace identity', () => {
+  const original = 'Does timeout:5 mean five seconds?';
+  expect(parseExpansion(body({ lex: [original], vec: [original], hyde: [] }), original)).toEqual(
+    empty(),
+  );
+  for (const [literal, changed] of [
+    ['timeout:5', 'timeout:6'],
+    ['timeout:-5', 'timeout:5'],
+    ['timeout:+5', 'timeout:5'],
+    ['node:fs', 'node:path'],
+    ['std::string', 'std::vector'],
+    ['port:8080', 'port:8081'],
+  ]) {
+    const query = `Explain ${literal}.`;
+    expect(parseExpansion(body({ lex: [query], vec: [query], hyde: [] }), query)).toEqual(empty());
+    const variant = `Find documentation about ${literal}`;
+    expect(parseExpansion(body({ lex: [variant], vec: [], hyde: [] }), query).lex).toEqual([
+      variant,
+    ]);
+    for (const replacement of [changed, 'the setting'])
+      expect(() =>
+        parseExpansion(body({ lex: [`Explain ${replacement}`], vec: [], hyde: [] }), query),
+      ).toThrow();
+  }
+});

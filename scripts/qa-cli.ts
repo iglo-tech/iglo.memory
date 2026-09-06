@@ -79,7 +79,7 @@ try {
   const query = await run(['search', 'token renewal']);
   if (query.results[0]?.heading !== 'Authentication') throw new Error('ranking');
   if (sha256(await Bun.file(file).bytes()) !== sourceHash) throw new Error('source mutation');
-  await run(['search', 'token version 1.2.3 value -1']);
+  await run(['search', 'token version 1.2.3 value -1 timeout:5']);
   const snapshot = join(root, '.agent/memory-index/snapshot.json');
   const prior = sha256(await Bun.file(snapshot).bytes());
   const failure = await run(['search', 'FAIL_PROVIDER token'], false);
