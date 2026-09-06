@@ -75,3 +75,32 @@ Start with offline identity and excerpt-coordinate checks. Reuse comparator
 outputs. Verify adapter metrics against existing hand-calculated fixtures and
 run configured checks if code changes. Independently review every completed
 slice before advancing. No held-out access until the gate freeze is committed.
+
+## T06-A2 replay and diagnostic contract
+
+The completed A1 trace identifies baseline `5e107a79…` (90 observations), QMD
+`0fad3e35…` (87), and separate d30 recovery `a94c090e…` (3). The corrected native
+presented ledger is `a680011c…`; retain recovery and interrupted-attempt accounting.
+Full identifiers and validated hashes live in the trace report. Proposal records
+are one calibration observation per question with a separate corrected d15.
+
+First implement an evaluation-only proposal adapter and current-code replay.
+Validate version2 passage/source ownership, exact codepoint coordinates, normalized
+source substring and permitted boundary ellipses. Replay captured successful
+expansion, embedding and rerank responses through current production code without
+network; compare original all-eight ordering and apply the current cutoff and
+presentation. Bind current source/config/snapshot/input hashes and disclose which
+historical bindings were absent. Fail mismatches, never silently fetch replacement
+outputs. Preserve the original d15 failure and separately name the repaired view.
+
+The first comparison is explicitly a useful-presence diagnostic, using each
+system's own declared observation count. Do not duplicate proposal rows or mix
+native CLI timing with in-process timing. Full-passage and displayed-snippet grades
+are separate. Native recovery sensitivity stays separate from original completed
+cohorts. Shared nDCG/span/facet/harm remains unresolved until new presented snippets
+have common minimal evidence units and independent adjudication.
+
+Ownership: replay worker owns `scripts/retrieval-eval/proposal.ts` and its new test
+file, plus ignored replay report/driver. Root owns integration, common-evidence
+adjudication, bilingual supplement, task state and comparison diagnostics. No
+production edits, API calls, QMD calls or held-out access in this replay slice.
