@@ -104,3 +104,22 @@ Ownership: replay worker owns `scripts/retrieval-eval/proposal.ts` and its new t
 file, plus ignored replay report/driver. Root owns integration, common-evidence
 adjudication, bilingual supplement, task state and comparison diagnostics. No
 production edits, API calls, QMD calls or held-out access in this replay slice.
+
+### Common evidence adjudication
+
+Keep the original reviewed labels and native corrections. For each newly presented
+proposal snippet, two independent agents review the same source-owned text without
+system scores or ranks. Each records grade, supported facets, explicit misleading
+judgment, a minimal exact supporting quote for positive grades, and whether it is
+a sufficient shorter rendering of an existing evidence unit. Reuse existing unit
+IDs for the same fact/span rather than creating one positive unit per result.
+Record genuine novel units with exact source offsets; deduplicate overlapping
+copies of the same unit. Grade-zero mappings require explicit review but add no
+positive denominator. Root adjudicates disagreements against source text before
+common graded metrics. A positive grade without a supporting quote or equivalent
+existing unit cannot be silently treated as span coverage.
+
+The first common-review packet contains 187 current-cutoff proposal snippets;
+native 324-excerpt judgments remain the reviewed starting point. Subsequent
+bilingual/ablation outputs enter the same pool when available. This is an incremental
+development pool, not a complete-corpus recall oracle.
