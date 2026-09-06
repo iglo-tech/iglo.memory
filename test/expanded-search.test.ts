@@ -57,6 +57,8 @@ test('typed expansion embeds semantic queries with instructions and HyDE as plai
       return 'fixture';
     },
     {
+      reranking: async (_query, documents) => documents.map((_, index) => ({ index, score: 1 })),
+      minimumScore: 0,
       expansion: async (query, key, options) => {
         expect(query).toBe('Gdzie są ustawienia?');
         expect(key).toBe('fixture');
@@ -98,7 +100,11 @@ test('lex-only and all-empty expansion require only the original embedding', asy
         return inputs.map(vector);
       },
       () => 'fixture',
-      { expansion },
+      {
+        expansion,
+        reranking: async (_query, documents) => documents.map((_, index) => ({ index, score: 1 })),
+        minimumScore: 0,
+      },
     );
     expect(calls).toBe(1);
     expect(result.results.some((item) => item.source.endsWith('settings.md'))).toBe(true);
@@ -165,7 +171,11 @@ test('original embedding failure cancels and settles expansion, preserving causa
         throw cause;
       },
       () => 'fixture',
-      { expansion },
+      {
+        expansion,
+        reranking: async (_query, documents) => documents.map((_, index) => ({ index, score: 1 })),
+        minimumScore: 0,
+      },
     ),
   ).rejects.toBe(cause);
   expect(settled).toBe(true);

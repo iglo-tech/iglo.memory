@@ -10,7 +10,7 @@ No local inference, new provider, QMD run, generalist-versus-specialist debate, 
 
 ## decisions
 
-One typed object {lex:[],vec:[],hyde:[]}, all keys required and no extras. Lex/vec each 0–2 strings, HyDE 0–1; trimmed well-formed strings of 1–512 code points, no controls, containing a letter/number. HyDE is at most 40 words and describes a documentation topic without invented answers. Empty arrays are a valid no-op. Dedupe exact strings per channel and remove original-equal lex/vec after validation. Source outputs never contain generated text.
+One typed object {lex:[],vec:[],hyde:[]}, all keys required and no extras. Lex/vec each 0–2 strings, HyDE 0–1; well-formed strings of 1–512 code points, with outer whitespace normalized before deduplication, no controls, containing a letter/number. HyDE is at most 40 words and describes a documentation topic without invented answers. Empty arrays are a valid no-op. Dedupe exact strings per channel and remove original-equal lex/vec after validation. Source outputs never contain generated text.
 
 Version the exact prompt carried by implementation. Start from corrected comparison prompt, add explicit untrusted-user/literal/all-empty rules. Preserve requested fact, negation, actor, scope and ambiguity. Polish queries retain Polish variants plus English bridges; other languages keep original language. Semantic fidelity is evaluated, never claimed proven by syntax validation.
 
@@ -47,3 +47,5 @@ Actual retrieval gain and full pipeline cost remain T06 gates. The full-query en
 ## qa_procedure
 
 Focused tests, controlled real CLI and configured checks; one declared-budget full-query probe, no repeats, QMD or held-out access. Verify then all three independent reviews on same commit.
+
+Development d15 exposed a faithful rewrite with one trailing space. T05 normalizes outer whitespace after validating raw length and rejecting controls; empty normalized strings still fail. This does not alter the original question or source evidence. Retain the first failed observation and verify the normalization regression.

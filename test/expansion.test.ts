@@ -100,17 +100,10 @@ test('strict nested schema rejects hostile, malformed and oversized channel valu
     { ...empty(), lex: 'word' },
     { ...empty(), lex: ['one', 'two', 'three'] },
     { ...empty(), hyde: ['one', 'two'] },
-    ...[
-      '',
-      ' ',
-      ' word',
-      'word ',
-      '...',
-      '\ud800',
-      'one\ntwo',
-      'one\u0000two',
-      'x'.repeat(513),
-    ].map((text) => ({ ...empty(), lex: [text] })),
+    ...['', ' ', '...', '\ud800', 'one\ntwo', 'one\u0000two', 'x'.repeat(513)].map((text) => ({
+      ...empty(),
+      lex: [text],
+    })),
     { ...empty(), hyde: ['word '.repeat(41).trim()] },
   ];
   for (const value of invalid) expect(() => parseExpansion(body(value), 'question')).toThrow();
@@ -274,4 +267,19 @@ test('numeric-bearing identifiers and scientific quantities are maximal satisfia
       parseExpansion(body({ lex: ['Find something else'], vec: [], hyde: [] }), query),
     ).toThrow();
   }
+});
+
+test('outer whitespace in generated variants is normalized before dedupe without relaxing raw guards', () => {
+  expect(
+    parseExpansion(
+      body({
+        lex: [' memory storage ', 'memory storage'],
+        vec: ['Where is memory stored? ', 'Which location stores memory? '],
+        hyde: [],
+      }),
+      'Where is memory stored?',
+    ),
+  ).toEqual({ lex: ['memory storage'], vec: ['Which location stores memory?'], hyde: [] });
+  for (const value of [' '.repeat(513) + 'word', '\nword', 'word\t', '   '])
+    expect(() => parseExpansion(body({ lex: [value], vec: [], hyde: [] }), 'question')).toThrow();
 });

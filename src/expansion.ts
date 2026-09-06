@@ -154,14 +154,17 @@ export function parseExpansion(body: unknown, query: string): Expansion {
   for (const channel of ['lex', 'vec', 'hyde'] as const) {
     const variants = value[channel];
     if (!Array.isArray(variants) || variants.length > (channel === 'hyde' ? 1 : 2)) throw failure();
-    for (const variant of variants) {
+    for (const rawVariant of variants) {
       if (
-        typeof variant !== 'string' ||
-        !variant.isWellFormed() ||
-        variant !== variant.trim() ||
+        typeof rawVariant !== 'string' ||
+        !rawVariant.isWellFormed() ||
+        Array.from(rawVariant).length > 512 ||
+        /\p{Cc}/u.test(rawVariant)
+      )
+        throw failure();
+      const variant = rawVariant.trim();
+      if (
         !variant ||
-        Array.from(variant).length > 512 ||
-        /\p{Cc}/u.test(variant) ||
         !/[\p{L}\p{N}]/u.test(variant) ||
         (channel === 'hyde' && variant.split(/\s+/u).length > 40)
       )

@@ -20,6 +20,12 @@ try {
     preload,
     `const log=Bun.file(${JSON.stringify(log)});
   globalThis.fetch=Object.assign(async(url,init)=>{
+    if(String(url)==='https://openrouter.ai/api/v1/rerank') {
+      const body=JSON.parse(init.body);
+      if(body.query.includes('FAIL_RERANK'))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
+      if(body.top_n!==body.documents.length)throw new Error('incomplete rerank');
+      return Response.json({model:'rerank-2.5',results:body.documents.map((text,index)=>({index,relevance_score:body.query==='unknown answer'?0:text.includes('rotation')?1:0.1,document:{text}})).reverse()});
+    }
     if(String(url)==='https://openrouter.ai/api/v1/chat/completions') {
       const body=JSON.parse(init.body);
       if(body.model!=='openai/gpt-5.6-luna'||body.reasoning.effort!=='low')throw new Error('expansion contract');
@@ -80,6 +86,10 @@ try {
   if (query.results[0]?.heading !== 'Authentication') throw new Error('ranking');
   if (sha256(await Bun.file(file).bytes()) !== sourceHash) throw new Error('source mutation');
   await run(['search', 'token version 1.2.3 value -1 timeout:5']);
+  if ((await run(['search', 'unknown answer'])).results.length !== 0) throw new Error('abstention');
+  const rerankFailure = await run(['search', 'FAIL_RERANK token'], false);
+  if (rerankFailure.error?.code !== 'RERANK_FAILED' || rerankFailure.results !== undefined)
+    throw new Error('rerank failure');
   const snapshot = join(root, '.agent/memory-index/snapshot.json');
   const prior = sha256(await Bun.file(snapshot).bytes());
   const failure = await run(['search', 'FAIL_PROVIDER token'], false);

@@ -34,6 +34,44 @@ export function tokenize(text: string): string[] {
   return result;
 }
 
+export type TokenOccurrence = { term: string; start: number; end: number };
+
+/** Codepoint ranges of complete tokens and their identifier aliases. */
+export function tokenOccurrences(text: string): TokenOccurrence[] {
+  const offsets = new Map<number, number>();
+  let units = 0,
+    points = 0;
+  offsets.set(0, 0);
+  for (const character of text) {
+    units += character.length;
+    offsets.set(units, ++points);
+  }
+  const result: TokenOccurrence[] = [];
+  const add = (term: string, start: number) => {
+    result.push({
+      term: term.toLowerCase(),
+      start: offsets.get(start)!,
+      end: offsets.get(start + term.length)!,
+    });
+  };
+  for (const match of text.matchAll(/[\p{L}\p{N}](?:[\p{L}\p{N}_./:@-]*[\p{L}\p{N}])?/gu)) {
+    add(match[0], match.index);
+    for (const part of match[0].matchAll(/[^_./:@-]+/gu)) {
+      const start = match.index + part.index;
+      add(part[0], start);
+      let offset = start;
+      for (const component of part[0]
+        .replace(/([\p{Ll}\p{N}])(\p{Lu})/gu, '$1 $2')
+        .replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, '$1 $2')
+        .split(' ')) {
+        add(component, offset);
+        offset += component.length;
+      }
+    }
+  }
+  return result;
+}
+
 export function buildLexical(chunks: Chunk[]): LexicalIndex {
   const fields = {} as LexicalIndex['fields'];
   const ids = new Set(chunks.map((chunk) => chunk.passageId));

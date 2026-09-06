@@ -1,5 +1,8 @@
 import { AppError } from '@/src/errors';
-import type { Config } from '@/src/config';
+import { DEFAULT_RERANK_MODEL, type Config } from '@/src/config';
+import { formattedInput } from '@/src/chunks';
+import { rerank } from '@/src/rerank';
+import { excerpt } from '@/src/presentation';
 import { embed } from '@/src/embedding';
 import { expand } from '@/src/expansion';
 import { budgetFor } from '@/src/token-budget';
@@ -146,7 +149,12 @@ export async function search(
   query: string,
   embedding = embed,
   credential = requireCredential,
-  options: { deadline?: number; expansion?: typeof expand } = {},
+  options: {
+    deadline?: number;
+    expansion?: typeof expand;
+    reranking?: typeof rerank;
+    minimumScore?: number;
+  } = {},
 ) {
   const deadline = options.deadline ?? performance.now() + 30_000;
   try {
@@ -171,7 +179,7 @@ export async function search(
         preparedAt: snapshot.preparedAt,
         responseVersion: 2,
         scoreKind: 'ordinal',
-        retrievalRevision: 'typed-expansion-v2',
+        retrievalRevision: 'qwen-luna-voyage-v2',
         results: [],
       };
     const budget = budgetFor(config.embedding.model);
@@ -251,13 +259,39 @@ export async function search(
       checkSearchDeadline(deadline);
       expanded.push(vectorCandidates(snapshot, vectors, vector, norms));
     }
-    const results = presentCandidates(fuseCandidates(lists, expanded));
+    const candidates = fuseCandidates(lists, expanded);
+    checkSearchDeadline(deadline);
+    const scores = await (options.reranking ?? rerank)(
+      query,
+      candidates.map(({ chunk }) => formattedInput(config.project, chunk, config.embedding.model)),
+      config.retrieval?.model ?? DEFAULT_RERANK_MODEL,
+      key,
+      { deadline },
+    );
+    // Development-selected cutoff; scores are not calibrated probabilities.
+    // See docs/specs/retrieval-v2-t05.md for sensitivity and rollout limits.
+    const minimumScore = options.minimumScore ?? 0.435546875;
+    const results = scores
+      .filter(({ score }) => score >= minimumScore)
+      .slice(0, 8)
+      .map(({ index }, rank) => {
+        const chunk = candidates[index]!.chunk;
+        return {
+          score: Math.round((1 / (rank + 1)) * 1e6) / 1e6,
+          passageId: chunk.passageId,
+          source: chunk.source,
+          heading: chunk.heading,
+          startLine: chunk.startLine,
+          endLine: chunk.endLine,
+          ...excerpt(snapshot, chunk, query),
+        };
+      });
     checkSearchDeadline(deadline);
     return {
       query,
       responseVersion: 2,
       scoreKind: 'ordinal',
-      retrievalRevision: 'typed-expansion-v2',
+      retrievalRevision: 'qwen-luna-voyage-v2',
       preparedAt: snapshot.preparedAt,
       results,
     };

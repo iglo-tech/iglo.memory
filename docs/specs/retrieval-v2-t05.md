@@ -48,3 +48,39 @@ Replay saved full-envelope provider result through parser. Controlled CLI exerci
 - excerpt(snapshot, chunk, originalQuery): {snippet,snippetSpan}. Reuse tokenize and prepared body document frequencies; sourcePosition already resolves normalized codepoint offsets. Do not modify stored text or add source reads.
 - Root assembles documents using formattedInput(snapshot.project identity from config, chunk, embedding model); no new context convention. Policy selects up to8 validated scores above calibrated cutoff in rerank order.
 - Token occurrence offsets must represent the complete lexical token or exact alias substring, not a substring inside unrelated words. Distinct query aliases count once each using prepared body IDF; candidate windows can be limited to boundaries where contained occurrence sets change. Deterministic earliest-start tie. All-codepoint fallback first400.
+
+## development calibration
+
+The initial 30-question run used the pinned corpus and complete production
+Qwen/Luna/Voyage path. One question failed because of a trailing space in a
+faithful generated rewrite. Raw observations remain intact; outer-space
+normalization and its regression fix were followed by one targeted corrected
+run. No QMD calls or timing repetitions were used. Total observed cost including
+602 prepared passages and the corrected run was $0.02224997; the declared ceiling
+was $1. These observations are development evidence, not a frozen release run.
+
+Three agents independently read disjoint blinded, shuffled evidence pools, grading
+complete passages and displayed snippets separately. They did not see model names,
+ranks or relevance scores. The 240 candidate judgments include eight from the
+corrected question. Existing reviewed source labels supplied context; previously
+unjudged evidence was read, not automatically treated as irrelevant. Qualified
+and ambiguous judgments remain recorded in the evaluation run storage.
+
+The method was fixed before score inspection: minimize equally weighted
+answerable-question missing-useful-evidence and unanswerable nonempty rates;
+then maximize retained useful passages from each question's scored top eight;
+then choose the higher cutoff. This selected `0.435546875`, applied inclusively.
+Scores are not probabilities. All 26 answerable questions retain at least one
+grade-2 full passage; all four unanswerable questions return empty. The average
+retained share of useful passages within these top-eight pools is 97.1%, not
+corpus-wide recall. The 187 selected passages include 95 grade-2 and 22 grade-0
+passages; this policy does not establish high precision merely by avoiding
+empty answerable results.
+
+Leave-one-development-question-out selected cutoffs range from `0.361328125` to
+`0.443359375`. The held-out development prediction for d27 becomes a false positive when that question is excluded from fitting (one of four unanswerable questions); answerable predictions remain useful. The small unanswerable sample and narrow separation remain risks.
+Only 23 of 26 answerable questions retain a grade-2 displayed snippet: d11, d20
+and d24 lose decisive evidence through clipping. Preserve this limitation in T06
+presentation metrics; do not substitute full-passage scores for snippet quality.
+The parent deterministic excerpt rule is implemented as specified. Any subsequent
+change must be specified and verified before freezing held-out evaluation.

@@ -114,7 +114,12 @@ try {
         'refresh token',
         async () => [vector],
         () => 'fixture',
-        { expansion: async () => ({ lex: [], vec: [], hyde: [] }) },
+        {
+          expansion: async () => ({ lex: [], vec: [], hyde: [] }),
+          reranking: async (_query, documents) =>
+            documents.map((_, index) => ({ index, score: 1 })),
+          minimumScore: 0,
+        },
       );
     }
     JSON.stringify(result);
