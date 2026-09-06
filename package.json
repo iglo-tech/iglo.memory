@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "tokenizers": "bun scripts/tokenizer-assets.ts",
     "lint": "oxlint --deny-warnings src test scripts",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",

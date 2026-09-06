@@ -8,7 +8,7 @@ reuse incompatible vectors. Runtime guards live in `src/token-budget.ts`,
 ## Qwen embeddings and tokenizer
 
 Default: `qwen/qwen3-embedding-8b`, 4096 dimensions, through OpenRouter.
-`@huggingface/tokenizers` 0.1.3 uses bundled Qwen assets from revision
+`@huggingface/tokenizers` 0.1.3 uses build-acquired Qwen assets from revision
 `1d8ad4ca9b3dd8059ad90a75d4983776a23d44af`. Count the complete string with
 `encode(text, {add_special_tokens: true})`: NFC normalization and the EOS
 postprocessor affect counts. Literal added-token strings retain their source
@@ -88,7 +88,7 @@ admission also enforces the embedding and Voyage limits.
 
 ## Asset provenance
 
-The tokenizer JSON was compacted with
+Builds download hash-pinned tokenizer JSON into ignored local assets and compact it with
 `JSON.stringify(JSON.parse(upstreamText)) + "\n"`; complete parsed objects are
 unchanged. Static imports support standalone offline counting. Keep licenses in
 `assets/tokenizers/`; tokenizer data is not inference weights.

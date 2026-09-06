@@ -98,7 +98,8 @@ The final replay pins the frozen seed, 2000 samples and 95% intervals.
 
 ```sh
 bun test test/retrieval-publication.test.ts test/retrieval-common.test.ts
-bun scripts/retrieval-eval/replay-publication.ts docs/evaluation/retrieval-v2-final /evaluation/corpus
+bun scripts/retrieval-eval/restore-publication.ts
+bun scripts/retrieval-eval/replay-publication.ts .cache/retrieval-v2-benchmark /evaluation/corpus
 ```
 
 The replay requires only local materialized sources. It makes no inference calls.

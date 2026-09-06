@@ -1,19 +1,25 @@
 # Offline benchmark replay
 
 See [the held-out report](../retrieval-v2-heldout.md) for findings and limits.
-This bundle reproduces a failed original release evaluation and a separate
+The restored bundle reproduces a failed original release evaluation and a separate
 supplemental diagnostic. Both decisions are `NO_ROLLOUT`. A successful replay
 confirms the published calculations, not product release acceptance.
 
 Use Bun 1.4.2. Materialize the pinned corpus using the existing
-[corpus instructions](../README.md#corpus-and-reproduction), then run:
+[corpus instructions](../README.md#corpus-and-reproduction), then restore the frozen bundle and run:
 
 ```sh
+bun scripts/retrieval-eval/restore-publication.ts
 bun scripts/retrieval-eval/replay-publication.ts \
-  docs/evaluation/retrieval-v2-final /absolute/path/to/materialized-corpus
+  .cache/retrieval-v2-benchmark /absolute/path/to/materialized-corpus
 ```
 
-The command is offline: no provider, QMD, model, checkout or source download is
+Restoration reads the pinned publication commit from local Git history and verifies
+its hashes; it needs that commit available (fetch history in a shallow clone).
+The generated bundle lives in ignored `.cache/retrieval-v2-benchmark/`. Repeating
+restoration validates cached bytes and repairs missing or corrupt files.
+
+The replay command is offline: no provider, QMD, model, checkout or source download is
 invoked. It checks bundle, module and source hashes; validates labels, evidence,
 coordinates and cohort membership; then reproduces per-question metrics,
 summary statistics, paired intervals and frozen gate decisions. Input drift or
@@ -22,7 +28,7 @@ path when invoking from another working directory.
 
 `labels.json` preserves the exact frozen reviewed 80-question file. The other
 JSON files are compact to avoid maintaining thousands of formatting-only lines.
-All bundle JSON is excluded from formatting because its exact bytes are hashed.
+The bundle is ignored build/evaluation data; it is not maintained in the source tree.
 `common.json` contains 223 evidence units and 793 reviewed displayed renderings.
 `observations.json` retains 192 rank-preserving captures: 50 baseline, 50 QMD,
 50 original proposal (8 actual and 42 evaluator skips), and 42 supplemental actual

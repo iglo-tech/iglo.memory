@@ -4,6 +4,7 @@ root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 config=$(mktemp /tmp/iglo-bun-config-XXXXXX.toml)
 trap 'rm -f "$config"' EXIT HUP INT TERM
 cd "$root"
+npx --yes bun@1.4.2 --no-env-file --no-install --config="$config" scripts/tokenizer-assets.ts
 sh scripts/native.sh
 node_modules/.bin/oxlint --deny-warnings src test scripts
 node_modules/.bin/oxfmt --check .

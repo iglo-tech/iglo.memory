@@ -133,6 +133,13 @@ sh scripts/build.sh
 python3 scripts/qa-terminal.py
 ```
 
+Build and check scripts prepare the pinned tokenizer JSON in an ignored local
+cache. The first run downloads about 11.43 MB of tokenizer data from Hugging Face;
+later runs verify the cache and work offline. Downloads are hash-checked before
+publication. The standalone executable embeds this data and never downloads a
+tokenizer at runtime. Before direct `bun test` or source development, run
+`bun run tokenizers` once. Keep the generated cache for offline builds.
+
 On Linux the default header location is `/usr/include/node`; override
 `NODE_INCLUDE_DIR` if needed. Run the resulting `dist/iglo.mem` from your worktree.
 For source development use the absolute path to `scripts/run.sh`. The supported
