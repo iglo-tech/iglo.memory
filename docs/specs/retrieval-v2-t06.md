@@ -223,3 +223,39 @@ corruption/missing-vector behavior. No source reads or inference. Reproduce with
 status over a prepared fixture, assert both fields, and prove the controlled CLI
 flow plus configured checks before independent reviews. This reopens only the
 missing T03 status detail; it does not start conditional T07 rollout.
+
+### T06-B locked-run tooling, before custody opens
+
+The development scorer and corrected common report pass independent review.
+Prepare an evaluation-only locked runner with synthetic fixtures before opening
+original held-out contents. Root will commit the numerical gate and source/model/
+prompt/config/snapshot/benchmark hashes first. Custody metadata already records
+50 reviewed held-out questions (39 answerable,11 unsupported), complete80 hash
+28e22bb194327eb08991fb9cb1030b064b9c42a7e12c24c95d0bcba112096e56 and heldout hash
+ebb22ab361ef332f61b4fbc80c5cac2da667105a01367a08258de10d907e5c87.
+
+The locked adapter accepts an explicit freeze manifest and its expected hash;
+validates the committed manifest identity and all configured file hashes BEFORE
+reading private labels; validates complete80 source spans/allocation/family split,
+then selects exactly the50 held-out questions. No relabeling as development.
+Common scoring gains an explicit held-out phase requiring a matching freeze hash;
+default development mode must continue rejecting held-out input. This is custody
+plumbing only: scoring formulas, prompts, ranking and cutoff do not change.
+
+Use existing exclusive resumable observation publication and Bun process capture.
+One observation per held-out question per system. Bind each command, project root,
+model/index environment, executable/build hash, timeout, raw output, elapsed time,
+known usage or explicit unknown, retry/failure and process interruption. Resume
+only identical frozen inputs; completed failures remain completed failures, not
+silently retried. Unknown active/lost claims remain explicit blockers/interruptions.
+Stock full QMD runs serially once per question with existing installed models and
+indexes; no timing repetitions or development queries. Baseline and proposal may
+run independently without mutating comparator snapshots. Keep original-question
+expansion, full reranking and all error behavior unchanged.
+
+Root owns the manifest, actual launch configurations, budget and post-run pooling.
+The tooling worker owns locked.ts, common scorer phase plumbing and focused tests;
+no real held-out reads, inference, QMD launches or commits while implementing it.
+Use synthetic tests for pre-read freeze/hash rejection, default custody rejection,
+complete split selection, identical resume, failed observation retention and
+explicit held-out scorer admission. Production CLI surface remains unchanged.
