@@ -69,10 +69,20 @@ export function validateCommon(
   questions: Question[],
   sources: Map<string, string>,
   expectedHashes: Record<string, string>,
+  phase: { split: 'held-out'; freezeHash: string } | { split: 'development' } = {
+    split: 'development',
+  },
 ): CommonReview {
   const root = object(value);
   check(root.version === 1 && root.protocol === COMMON_PROTOCOL, 'Invalid common protocol');
   const hashes = object(root.hashes);
+  check(
+    phase.split === 'development' ||
+      (phase.split === 'held-out' &&
+        /^[a-f0-9]{64}$/.test(phase.freezeHash) &&
+        hashes.releaseFreeze === phase.freezeHash),
+    'Common held-out phase requires matching release freeze',
+  );
   const keys = Object.keys(expectedHashes);
   check(
     keys.length > 0 &&
@@ -89,7 +99,7 @@ export function validateCommon(
   const byQuestion = new Map<string, Question>();
   const contracts = new Map<string, string>();
   for (const q of questions) {
-    check(q.split === 'development', 'Held-out inputs forbidden in common scorer');
+    check(q.split === phase.split, 'Question split forbidden in common scorer phase');
     check(nonempty(q.id) && !byQuestion.has(q.id), 'Duplicate common question');
     check(strings(q.facets), 'Invalid question facets');
     byQuestion.set(q.id, q);
