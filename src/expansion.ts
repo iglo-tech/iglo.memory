@@ -59,7 +59,9 @@ export function expansionRequest(query: string) {
 function anchors(text: string): Set<string> {
   const result = new Set<string>();
   for (const match of text.matchAll(/`([^`]+)`/gu)) result.add(match[1]!);
-  for (const match of text.matchAll(/(?<![\p{L}\p{N}_])\d+(?:[.,]\d+)?%?(?![\p{L}\p{N}_])/gu))
+  for (const match of text.matchAll(
+    /(?<![\p{L}\p{N}_./:@+-])[+-]?\d+(?:[.,:-]\d+)*%?(?![\p{L}\p{N}_./:@+-])/gu,
+  ))
     result.add(match[0]);
   for (const match of text.matchAll(/[\p{L}\p{N}_./:@-]+/gu)) {
     const token = match[0].replace(/[.:]+$/u, '');

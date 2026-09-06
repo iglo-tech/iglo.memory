@@ -200,3 +200,27 @@ test('local admission, expired deadline and oversized responses fail without par
   });
   expect(calls).toBe(1);
 });
+
+test('maximal quantities preserve versions, signs and dates without overlapping anchors', () => {
+  for (const literal of [
+    '1.2.3',
+    '-1',
+    '+2',
+    '-1.25',
+    '25%',
+    '2026-09-06',
+    '12:30',
+    'v1.2.3',
+    'docs/2026/09.md',
+  ]) {
+    const query = `Explain ${literal}`;
+    expect(parseExpansion(body({ lex: [query], vec: [], hyde: [] }), query)).toEqual(empty());
+    expect(
+      parseExpansion(body({ lex: [`Find details about ${literal}`], vec: [], hyde: [] }), query)
+        .lex,
+    ).toEqual([`Find details about ${literal}`]);
+    expect(() =>
+      parseExpansion(body({ lex: ['Find details'], vec: [], hyde: [] }), query),
+    ).toThrow();
+  }
+});

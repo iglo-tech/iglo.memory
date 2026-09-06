@@ -25,7 +25,7 @@ try {
       if(body.model!=='openai/gpt-5.6-luna'||body.reasoning.effort!=='low')throw new Error('expansion contract');
       const query=body.messages[1].content;
       if(query.includes('FAIL_EXPANSION'))return new Response('DUMMY_PROVIDER_SECRET',{status:400});
-      const content=JSON.stringify(query==='token renewal'?{lex:['token rotation'],vec:['How to renew a token?'],hyde:[]}:{lex:[],vec:[],hyde:[]});
+      const content=JSON.stringify(query==='token renewal'?{lex:['token rotation'],vec:['How to renew a token?'],hyde:[]}:{lex:[query],vec:[],hyde:[]});
       return Response.json({model:body.model,choices:[{index:0,finish_reason:'stop',message:{role:'assistant',content}}]});
     }
     if(String(url)!=='https://openrouter.ai/api/v1/embeddings')throw new Error('unexpected endpoint');
@@ -79,6 +79,7 @@ try {
   const query = await run(['search', 'token renewal']);
   if (query.results[0]?.heading !== 'Authentication') throw new Error('ranking');
   if (sha256(await Bun.file(file).bytes()) !== sourceHash) throw new Error('source mutation');
+  await run(['search', 'token version 1.2.3 value -1']);
   const snapshot = join(root, '.agent/memory-index/snapshot.json');
   const prior = sha256(await Bun.file(snapshot).bytes());
   const failure = await run(['search', 'FAIL_PROVIDER token'], false);
