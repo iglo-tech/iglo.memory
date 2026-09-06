@@ -1,7 +1,8 @@
 import { afterEach, expect, test } from 'bun:test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { observeProposal } from '@/scripts/retrieval-eval/proposal-observation';
+import { observeProposal, proposalObserver } from '@/scripts/retrieval-eval/proposal-observation';
+import { requestSearchJson } from '@/src/search-transport';
 import { prepare } from '@/src/prepare';
 import { cleanup, repository } from '@/test/helpers';
 const config = { project: 'fixture', embedding: { model: 'fixture' } };
@@ -84,4 +85,128 @@ test('empty snapshot observation needs neither credentials nor requests', async 
   expect(observation.requests).toEqual([]);
   expect(observation.knownCost).toBe(0);
   expect(observation.unknownCosts).toBe(0);
+});
+
+test('stalled HTTP 400 bodies are cancelled without reading or retrying', async () => {
+  const root = await setup();
+  let calls = 0;
+  let pulls = 0;
+  let cancels = 0;
+  const injected = Object.assign(
+    async () => {
+      calls++;
+      return new Response(
+        new ReadableStream<Uint8Array>(
+          {
+            pull() {
+              pulls++;
+              return new Promise(() => {});
+            },
+            cancel() {
+              cancels++;
+            },
+          },
+          { highWaterMark: 0 },
+        ),
+        { status: 400 },
+      );
+    },
+    { preconnect: () => {} },
+  );
+  const observation = await observeProposal(root, 'prepare', injected, () => 'unused');
+  expect(observation.status).toBe('FAIL');
+  expect(calls).toBe(2); // Concurrent original embedding and expansion, one attempt each.
+  expect(pulls).toBe(0);
+  expect(cancels).toBe(2);
+  expect(observation.requests).toHaveLength(2);
+  expect(observation.unknownCosts).toBe(2);
+  expect(observation.knownCost).toBe(0);
+});
+
+test('oversized success stops at the production byte budget and retains an unknown attempt', async () => {
+  let pulls = 0;
+  let cancels = 0;
+  let calls = 0;
+  const observer = proposalObserver(
+    Object.assign(
+      async () => {
+        calls++;
+        return new Response(
+          new ReadableStream<Uint8Array>(
+            {
+              pull(controller) {
+                pulls++;
+                controller.enqueue(new Uint8Array(300 * 1024));
+              },
+              cancel() {
+                cancels++;
+              },
+            },
+            { highWaterMark: 0 },
+          ),
+        );
+      },
+      { preconnect: () => {} },
+    ),
+  );
+  await expect(
+    requestSearchJson(
+      'https://fixture/embeddings',
+      { body: '{}' },
+      {
+        code: 'EMBEDDING_FAILED',
+        deadline: performance.now() + 500,
+        maxBytes: 512 * 1024,
+      },
+      observer.fetch,
+    ),
+  ).rejects.toMatchObject({ code: 'EMBEDDING_FAILED', details: { reason: 'budget' } });
+  expect(calls).toBe(1);
+  expect(pulls).toBe(2);
+  expect(cancels).toBe(1);
+  expect(observer.requests).toHaveLength(1);
+  expect(observer.requests[0]?.response).toBeUndefined();
+  expect(observer.costs()).toEqual({ knownCost: 0, unknownCosts: 1 });
+});
+
+test('deadline cancellation keeps partially consumed attempts with unknown usage', async () => {
+  let pulls = 0;
+  let cancels = 0;
+  const observer = proposalObserver(
+    Object.assign(
+      async () =>
+        new Response(
+          new ReadableStream<Uint8Array>(
+            {
+              pull(controller) {
+                if (++pulls === 1)
+                  controller.enqueue(new TextEncoder().encode('{"usage":{"cost":1}'));
+                else return new Promise(() => {});
+              },
+              cancel() {
+                cancels++;
+              },
+            },
+            { highWaterMark: 0 },
+          ),
+        ),
+      { preconnect: () => {} },
+    ),
+  );
+  await expect(
+    requestSearchJson(
+      'https://fixture/embeddings',
+      { body: '{}' },
+      {
+        code: 'EMBEDDING_FAILED',
+        deadline: performance.now() + 50,
+        maxBytes: 512 * 1024,
+      },
+      observer.fetch,
+    ),
+  ).rejects.toMatchObject({ code: 'SEARCH_TIMEOUT' });
+  expect(cancels).toBe(1);
+  expect(observer.requests).toHaveLength(1);
+  expect(observer.requests[0]?.response).toBeUndefined();
+  expect(observer.costs()).toEqual({ knownCost: 0, unknownCosts: 1 });
 });

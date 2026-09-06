@@ -306,6 +306,7 @@ export async function runLockedSystem(
       throw new Error(`Locked system has an active or interrupted claim: ${system.id}`);
     throw error;
   }
+  let completed = false;
   try {
     const observations: {
       question: string;
@@ -367,9 +368,12 @@ export async function runLockedSystem(
       });
       observations.push({ question: question.id, system: system.id, observation });
     }
+    completed = true;
     return observations;
   } finally {
     await claim.close();
-    await unlink(claimPath);
+    // runUnit releases its per-unit claim even if publication fails after a
+    // paid command. Retain this system claim unless every result is durable.
+    if (completed) await unlink(claimPath);
   }
 }

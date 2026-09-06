@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { allocation, type Labels, type Question } from '@/scripts/retrieval-eval/labels';
@@ -302,6 +302,39 @@ test('one serial observation per question resumes identically and retains failur
     const resumed = await runLockedSystem(await f.load(), 'qmd', directory, execute);
     expect(calls).toBe(50);
     expect(resumed).toEqual(first);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('publication failure after execution retains a blocking system claim after disk repair', async () => {
+  const f = fixture(),
+    loaded = await f.load();
+  const directory = await mkdtemp(join(tmpdir(), 'retrieval-locked-publication-'));
+  let calls = 0,
+    obstruction = '';
+  const execute: LockedCapture = async (...args) => {
+    calls++;
+    if (calls === 1) {
+      obstruction = join(directory, args[2], `${args[3]}.json`);
+      await mkdir(obstruction);
+    }
+    return successful(...args);
+  };
+  try {
+    await expect(runLockedSystem(loaded, 'qmd', directory, execute)).rejects.toThrow();
+    expect(calls).toBe(1);
+    await rm(obstruction, { recursive: true });
+    let resumeError: unknown;
+    try {
+      await runLockedSystem(await f.load(), 'qmd', directory, execute);
+    } catch (error) {
+      resumeError = error;
+    }
+    expect(calls).toBe(1);
+    expect(resumeError).toBeInstanceOf(Error);
+    expect((resumeError as Error).message).toContain('active or interrupted claim');
+    expect(await Bun.file(join(directory, 'qmd.claim')).exists()).toBe(true);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
