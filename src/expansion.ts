@@ -65,12 +65,14 @@ function anchors(text: string): Set<string> {
   }
   // A joined namespace or key:value is one literal: extracting only its number
   // would conflict with the boundary checks used when matching that literal.
+  // Numeric-bearing tokens also stay whole (UTF-8, HTTP2, 1e-3, 5ms).
   for (const match of text.matchAll(/[\p{L}\p{N}_./:@+-]+/gu)) {
     const token = match[0].replace(/[.:]+$/u, '');
     if (
       /^--?[\p{L}][\p{L}\p{N}_-]*$/u.test(token) ||
       token.includes('/') ||
       token.includes('_') ||
+      /\p{N}/u.test(token) ||
       /[\p{L}\p{N}_]:+[\p{L}\p{N}_+-]/u.test(token) ||
       /[\p{L}\p{N}]\.[\p{L}\p{N}]/u.test(token) ||
       /\p{Ll}\p{Lu}/u.test(token) ||

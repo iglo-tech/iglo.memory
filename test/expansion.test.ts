@@ -262,3 +262,16 @@ test('colon-qualified literals preserve exact originals and namespace identity',
       ).toThrow();
   }
 });
+
+test('numeric-bearing identifiers and scientific quantities are maximal satisfiable anchors', () => {
+  for (const literal of ['UTF-8', '1e-3', '1E+3', 'HTTP2', 'v2', '5ms', '٣', '3,5', '25%']) {
+    const query = `Explain ${literal}`;
+    expect(parseExpansion(body({ lex: [query], vec: [query], hyde: [] }), query)).toEqual(empty());
+    expect(
+      parseExpansion(body({ lex: [`Find ${literal}`], vec: [], hyde: [] }), query).lex,
+    ).toEqual([`Find ${literal}`]);
+    expect(() =>
+      parseExpansion(body({ lex: ['Find something else'], vec: [], hyde: [] }), query),
+    ).toThrow();
+  }
+});
